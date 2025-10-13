@@ -1,0 +1,6 @@
+@OnlineEbookReader.Server_HostAddress = http://localhost:5108
+
+GET {{OnlineEbookReader.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
