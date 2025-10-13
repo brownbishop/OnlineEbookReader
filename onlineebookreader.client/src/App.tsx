@@ -10,6 +10,8 @@ interface Forecast {
 }
 
 function App() {
+    const url = "https://react-reader.metabits.no/files/alice.epub"; 
+    const title = "Alice in wonderland"; 
     const [forecasts, setForecasts] = useState<Forecast[]>();
 
     useEffect(() => {
@@ -45,8 +47,8 @@ function App() {
             <p>This component demonstrates fetching data from the server.</p>
             {contents}
             <Link to={`/reader/?url=${url}&title=${title}`}>
-           Alice in Wonderland
-        </Link>
+            Alice in Wonderland
+            </Link>
         </div>
     );
 
