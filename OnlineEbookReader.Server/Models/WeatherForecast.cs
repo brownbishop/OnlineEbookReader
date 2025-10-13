@@ -1,4 +1,4 @@
-namespace OnlineEbookReader.Server
+namespace OnlineEbookReader.Server.Models
 {
     public class WeatherForecast
     {

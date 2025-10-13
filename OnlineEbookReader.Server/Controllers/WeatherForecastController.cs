@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using OnlineEbookReader.Server.Models;
 
 namespace OnlineEbookReader.Server.Controllers
 {
