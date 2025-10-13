@@ -1,11 +1,14 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import {createRoot} from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import { BrowserRouter } from 'react-router-dom'
+import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import Reader from './components/Reader.tsx'
 
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
-        <App />
+        <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/reader" element={<Reader />} />
+        </Routes>
     </BrowserRouter>,
 )

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router';
 import './App.css';
 
 interface Forecast {
@@ -43,6 +44,9 @@ function App() {
             <h1 id="tableLabel">Weather forecast</h1>
             <p>This component demonstrates fetching data from the server.</p>
             {contents}
+            <Link to={`/reader/?url=${url}&title=${title}`}>
+           Alice in Wonderland
+        </Link>
         </div>
     );
 
