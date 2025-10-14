@@ -46,7 +46,7 @@ namespace OnlineEbookReader.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products");
+                    b.ToTable("Books");
                 });
 #pragma warning restore 612, 618
         }

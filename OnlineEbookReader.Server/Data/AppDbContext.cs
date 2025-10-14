@@ -6,7 +6,7 @@ namespace OnlineEbookReader.Server.Data {
             : base(options)
         {}
 
-        public DbSet<Book> Products {get; set; }
+        public DbSet<Book> Books {get; set; }
     }
 
 }
