@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using OnlineEbookReader.Server.Models;
 using OnlineEbookReader.Server.Data;
 
@@ -7,7 +6,7 @@ namespace OnlineEbookReader.Server.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class BooksController : Controller
+    public class BooksController : ControllerBase 
     {
         private readonly AppDbContext _context;
 
@@ -29,13 +28,14 @@ namespace OnlineEbookReader.Server.Controllers
                 CoverImageUrl = x.CoverImageUrl,
                 FileUrl = x.FileUrl,
             }).ToArray();
-            
-            result.Append(new Book
+
+            return Enumerable.Range(1, 5).Select(index => new Book
             {
-                Id = 1,
-                Title = "Something",
+                Id = index,
+                Author = $"Author {index}",
+                Title = $"Title {index}",
+                Description = $"Description {index}",
             });
-            return result.AsEnumerable();
         }
         //
         // public ActionResult Index()
