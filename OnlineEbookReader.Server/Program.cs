@@ -33,4 +33,6 @@ app.MapControllers();
 
 app.MapFallbackToFile("/index.html");
 
+app.Environment.WebRootPath = "wwwroot";
+
 app.Run();

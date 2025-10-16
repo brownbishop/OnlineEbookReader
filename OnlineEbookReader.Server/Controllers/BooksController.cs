@@ -9,9 +9,11 @@ namespace OnlineEbookReader.Server.Controllers
     public class BooksController : ControllerBase 
     {
         private readonly AppDbContext _context;
+        private readonly IWebHostEnvironment _env; 
 
-        public BooksController(AppDbContext context)
+        public BooksController(IWebHostEnvironment env, AppDbContext context)
         {
+            _env = env;
             _context = context;
         }
 
@@ -37,79 +39,43 @@ namespace OnlineEbookReader.Server.Controllers
                 Description = $"Description {index}",
             });
         }
-        //
-        // public ActionResult Index()
-        // {
-        //     return View();
-        // }
-        //
-        // // GET: BooksController/Details/5
-        // public ActionResult Details(int id)
-        // {
-        //     return View();
-        // }
-        //
-        // // GET: BooksController/Create
-        // public ActionResult Create()
-        // {
-        //     return View();
-        // }
-        //
-        // // POST: BooksController/Create
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public ActionResult Create(IFormCollection collection)
-        // {
-        //     try
-        //     {
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     catch
-        //     {
-        //         return View();
-        //     }
-        // }
-        //
-        // // GET: BooksController/Edit/5
-        // public ActionResult Edit(int id)
-        // {
-        //     return View();
-        // }
-        //
-        // // POST: BooksController/Edit/5
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public ActionResult Edit(int id, IFormCollection collection)
-        // {
-        //     try
-        //     {
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     catch
-        //     {
-        //         return View();
-        //     }
-        // }
-        //
-        // // GET: BooksController/Delete/5
-        // public ActionResult Delete(int id)
-        // {
-        //     return View();
-        // }
-        //
-        // // POST: BooksController/Delete/5
-        // [HttpPost]
-        // [ValidateAntiForgeryToken]
-        // public ActionResult Delete(int id, IFormCollection collection)
-        // {
-        //     try
-        //     {
-        //         return RedirectToAction(nameof(Index));
-        //     }
-        //     catch
-        //     {
-        //         return View();
-        //     }
-        // }
+
+        [HttpPost]
+        public async Task<ActionResult<Book>> Post([FromBody] Book book) { 
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+            return Created($"Books/{book.Id}", book);   
+        }
+
+        [HttpPost]
+        [Route("UploadBook")]
+        public async Task<IActionResult> Post(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            
+            var fileExtension = Path.GetExtension(file.FileName);
+            if (fileExtension != ".epub" && fileExtension != ".epub3")
+                return BadRequest("File format not supported, please upload epub files next time!");
+            
+            var uniqueFileName = $"{Guid.NewGuid()}{fileExtension}"; 
+            var uploadsPath = Path.Combine(_env.WebRootPath,  "uploads");
+            Console.Error.WriteLine($"{_env.WebRootFileProvider} {_env.WebRootPath} {file.Name}");
+                
+            if (!Directory.Exists(uploadsPath))
+            {
+                Directory.CreateDirectory(uploadsPath);
+            }
+            var filePath = Path.Combine(uploadsPath, uniqueFileName);
+
+            await using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            return Ok(new {file.Name, file.Length}); 
+        }
+        
     }
 }
