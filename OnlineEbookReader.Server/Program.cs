@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineEbookReader.Server.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -10,6 +12,17 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
         options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+   .AddJwtBearer(options =>
+   {
+       options.Authority = "OnlineEbookReader.domain";
+       options.Audience = "OnlineEbookReader.Audience";
+       options.RequireHttpsMetadata = false;
+   });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -27,6 +40,9 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseStaticFiles();
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
