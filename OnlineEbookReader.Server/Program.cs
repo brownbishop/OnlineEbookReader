@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using OnlineEbookReader.Server.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using OnlineEbookReader.Server.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
