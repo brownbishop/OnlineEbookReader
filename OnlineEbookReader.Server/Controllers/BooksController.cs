@@ -41,12 +41,13 @@ namespace OnlineEbookReader.Server.Controllers
             return result;
         }
 
-        [HttpGet]
-        [Route("id")]
-        public ActionResult<Book> GetBookById([FromBody] int id) {
-            return _context.Books
-                .Where(x => x.Id == id)
-                .Single();
+        [HttpGet("{id}")]
+        public ActionResult<Book> GetBookById(int id)
+        {
+            var book =  _context.Books.Find( id);
+            if (book == null)
+                return BadRequest("Book not found");
+            return book;
         }
 
         [HttpGet]
