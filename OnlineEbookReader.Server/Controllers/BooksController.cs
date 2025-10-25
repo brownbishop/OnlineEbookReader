@@ -49,6 +49,18 @@ namespace OnlineEbookReader.Server.Controllers
                 return BadRequest("Book not found");
             return book;
         }
+        [HttpGet("download/{id}")]
+        public ActionResult DownloadBookById(int id)
+        {
+            var book = _context.Books.Find(id);
+            if (book == null)
+                return BadRequest("Book not found");
+
+            if (System.IO.File.Exists(book.FileUrl))
+                return BadRequest($"No file associated with book {book.Title}"); 
+
+            return File(System.IO.File.OpenRead(book.FileUrl), "application/octet-stream", Path.GetFileName(book.FileUrl));
+        }
 
         [HttpGet]
         [Route("search")]
