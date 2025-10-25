@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using OnlineEbookReader.Server.Models;
 using OnlineEbookReader.Server.Data;
 using VersOne.Epub;
@@ -49,6 +50,7 @@ namespace OnlineEbookReader.Server.Controllers
                 return BadRequest("Book not found");
             return book;
         }
+
         [HttpGet("download/{id}")]
         public ActionResult DownloadBookById(int id)
         {
@@ -56,10 +58,23 @@ namespace OnlineEbookReader.Server.Controllers
             if (book == null)
                 return BadRequest("Book not found");
 
-            if (System.IO.File.Exists(book.FileUrl))
-                return BadRequest($"No file associated with book {book.Title}"); 
+            if (!System.IO.File.Exists(book.FileUrl))
+                return BadRequest($"No file associated with book {book.Title} {book.FileUrl}");
 
             return File(System.IO.File.OpenRead(book.FileUrl), "application/octet-stream", Path.GetFileName(book.FileUrl));
+        }
+
+        [HttpGet("downloadcover/{id}")]
+        public ActionResult DownloadBookCoverById(int id)
+        {
+            var book = _context.Books.Find(id);
+            if (book == null)
+                return BadRequest("Book not found");
+
+            if (!System.IO.File.Exists(book.CoverImageUrl))
+                return BadRequest($"No file associated with book {book.Title}");
+
+            return File(System.IO.File.OpenRead(book.CoverImageUrl), "application/octet-stream", Path.GetFileName(book.FileUrl));
         }
 
         [HttpGet]
