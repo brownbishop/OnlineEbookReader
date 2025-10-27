@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 using OnlineEbookReader.Server.Models;
 using OnlineEbookReader.Server.Data;
 using VersOne.Epub;
@@ -28,8 +30,20 @@ namespace OnlineEbookReader.Server.Controllers
 
         // GET: BooksController
         [HttpGet(Name = "GetBooks")]
-        public IEnumerable<Book> GetBooks()
+        public ActionResult GetBooks()
         {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return BadRequest("current user is not found");
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("failed to find user in database");
+            }
+            
             var result = _context.Books.Select(x => new Book
             {
                 Id = x.Id,
@@ -38,27 +52,60 @@ namespace OnlineEbookReader.Server.Controllers
                 Description = x.Description,
                 CoverImageUrl = x.CoverImageUrl,
                 FileUrl = x.FileUrl,
-            }).ToArray();
+            }).ToArray().Where(x => user.BookIds.Contains(x.Id));
 
-            return result;
+            return Ok(new {result, username});
         }
 
         [HttpGet("{id}")]
         public ActionResult<Book> GetBookById(int id)
         {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return BadRequest("current user is not found");
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("failed to find user in database");
+            }
+            
             var book =  _context.Books.Find( id);
+            
             if (book == null)
                 return BadRequest("Book not found");
+            
+            if (!user.BookIds.Contains(book.Id))
+                return BadRequest("current user doesn't own book");
+            
             return book;
         }
 
         [HttpGet("download/{id}")]
         public ActionResult DownloadBookById(int id)
         {
-            var book = _context.Books.Find(id);
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return BadRequest("current user is not found");
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("failed to find user in database");
+            }
+            
+            var book =  _context.Books.Find( id);
+            
             if (book == null)
                 return BadRequest("Book not found");
-
+            
+            if (!user.BookIds.Contains(book.Id))
+                return BadRequest("current user doesn't own book");
+            
             if (!System.IO.File.Exists(book.FileUrl))
                 return BadRequest($"No file associated with book {book.Title} {book.FileUrl}");
 
@@ -68,10 +115,26 @@ namespace OnlineEbookReader.Server.Controllers
         [HttpGet("downloadcover/{id}")]
         public ActionResult DownloadBookCoverById(int id)
         {
-            var book = _context.Books.Find(id);
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return BadRequest("current user is not found");
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("failed to find user in database");
+            }
+            
+            var book =  _context.Books.Find( id);
+            
             if (book == null)
                 return BadRequest("Book not found");
-
+            
+            if (!user.BookIds.Contains(book.Id))
+                return BadRequest("current user doesn't own book");
+            
             if (!System.IO.File.Exists(book.CoverImageUrl))
                 return BadRequest($"No file associated with book {book.Title}");
 
@@ -86,6 +149,18 @@ namespace OnlineEbookReader.Server.Controllers
                     return false;
                 return container.ToLower().Contains(search.ToLower());
             };
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return [];
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return [];
+            } 
+            
             var books = _context.Books.Select(x => new Book
             {
                 Id = x.Id,
@@ -97,7 +172,8 @@ namespace OnlineEbookReader.Server.Controllers
             }).ToArray();
 
             return books.Where(x =>
-                    contains (x.Title, searchParam)
+                    user.BookIds.Contains(x.Id) 
+                    || contains (x.Title, searchParam)
                     || contains (x.Author, searchParam)
                     || contains (x.Description, searchParam));
 
@@ -105,7 +181,15 @@ namespace OnlineEbookReader.Server.Controllers
 
         [HttpPost]
         public async Task<ActionResult<Book>> Post([FromBody] Book book) {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+                return BadRequest("failed to find current user from token"); 
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+                return BadRequest($"failed to find {username} in database"); 
+            
             _context.Books.Add(book);
+            user.BookIds = user.BookIds.Append(book.Id).ToArray();
             await _context.SaveChangesAsync();
             return Created($"Books/{book.Id}", book);
         }
@@ -114,6 +198,18 @@ namespace OnlineEbookReader.Server.Controllers
         [Route("UploadBook")]
         public async Task<IActionResult> Post(IFormFile file)
         {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return BadRequest("current user is not found");
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("failed to find user in database");
+            }
+            
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
 
@@ -157,6 +253,7 @@ namespace OnlineEbookReader.Server.Controllers
             }
 
             _context.Books.Add(book);
+            user.BookIds = user.BookIds.Append(book.Id).ToArray();
             _context.SaveChanges();
             return Ok(new {file.Name, file.Length});
         }
