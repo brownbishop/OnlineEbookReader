@@ -6,6 +6,7 @@ using VersOne.Epub;
 
 namespace OnlineEbookReader.Server.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("[controller]")]
     public class BooksController : ControllerBase
