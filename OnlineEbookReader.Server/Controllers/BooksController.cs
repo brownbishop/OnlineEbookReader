@@ -30,18 +30,18 @@ namespace OnlineEbookReader.Server.Controllers
 
         // GET: BooksController
         [HttpGet(Name = "GetBooks")]
-        public ActionResult GetBooks()
+        public IEnumerable<Book> GetBooks()
         {
             var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (username == null)
             {
-                return BadRequest("current user is not found");
+                return [];
             }
 
             var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
             if (user == null)
             {
-                return BadRequest("failed to find user in database");
+                return [];
             }
             
             var result = _context.Books.Select(x => new Book
@@ -54,7 +54,7 @@ namespace OnlineEbookReader.Server.Controllers
                 FileUrl = x.FileUrl,
             }).ToArray().Where(x => user.BookIds.Contains(x.Id));
 
-            return Ok(new {result, username});
+            return result;
         }
 
         [HttpGet("{id}")]
@@ -194,8 +194,7 @@ namespace OnlineEbookReader.Server.Controllers
             return Created($"Books/{book.Id}", book);
         }
 
-        [HttpPost]
-        [Route("UploadBook")]
+        [HttpPost("Upload")]
         public async Task<IActionResult> Post(IFormFile file)
         {
             var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
