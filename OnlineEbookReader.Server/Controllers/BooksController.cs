@@ -10,7 +10,7 @@ namespace OnlineEbookReader.Server.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class BooksController : ControllerBase
     {
         private int lastBookId;
@@ -43,7 +43,7 @@ namespace OnlineEbookReader.Server.Controllers
             {
                 return [];
             }
-            
+
             var result = _context.Books.Select(x => new Book
             {
                 Id = x.Id,
@@ -71,15 +71,15 @@ namespace OnlineEbookReader.Server.Controllers
             {
                 return BadRequest("failed to find user in database");
             }
-            
+
             var book =  _context.Books.Find( id);
-            
+
             if (book == null)
                 return BadRequest("Book not found");
-            
+
             if (!user.BookIds.Contains(book.Id))
                 return BadRequest("current user doesn't own book");
-            
+
             return book;
         }
 
@@ -97,15 +97,15 @@ namespace OnlineEbookReader.Server.Controllers
             {
                 return BadRequest("failed to find user in database");
             }
-            
+
             var book =  _context.Books.Find( id);
-            
+
             if (book == null)
                 return BadRequest("Book not found");
-            
+
             if (!user.BookIds.Contains(book.Id))
                 return BadRequest("current user doesn't own book");
-            
+
             if (!System.IO.File.Exists(book.FileUrl))
                 return BadRequest($"No file associated with book {book.Title} {book.FileUrl}");
 
@@ -126,15 +126,15 @@ namespace OnlineEbookReader.Server.Controllers
             {
                 return BadRequest("failed to find user in database");
             }
-            
+
             var book =  _context.Books.Find( id);
-            
+
             if (book == null)
                 return BadRequest("Book not found");
-            
+
             if (!user.BookIds.Contains(book.Id))
                 return BadRequest("current user doesn't own book");
-            
+
             if (!System.IO.File.Exists(book.CoverImageUrl))
                 return BadRequest($"No file associated with book {book.Title}");
 
@@ -159,8 +159,8 @@ namespace OnlineEbookReader.Server.Controllers
             if (user == null)
             {
                 return [];
-            } 
-            
+            }
+
             var books = _context.Books.Select(x => new Book
             {
                 Id = x.Id,
@@ -172,7 +172,7 @@ namespace OnlineEbookReader.Server.Controllers
             }).ToArray();
 
             return books.Where(x =>
-                    user.BookIds.Contains(x.Id) 
+                    user.BookIds.Contains(x.Id)
                     || contains (x.Title, searchParam)
                     || contains (x.Author, searchParam)
                     || contains (x.Description, searchParam));
@@ -183,11 +183,11 @@ namespace OnlineEbookReader.Server.Controllers
         public async Task<ActionResult<Book>> Post([FromBody] Book book) {
             var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             if (username == null)
-                return BadRequest("failed to find current user from token"); 
+                return BadRequest("failed to find current user from token");
             var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
             if (user == null)
-                return BadRequest($"failed to find {username} in database"); 
-            
+                return BadRequest($"failed to find {username} in database");
+
             _context.Books.Add(book);
             user.BookIds = user.BookIds.Append(book.Id).ToArray();
             await _context.SaveChangesAsync();
@@ -208,7 +208,7 @@ namespace OnlineEbookReader.Server.Controllers
             {
                 return BadRequest("failed to find user in database");
             }
-            
+
             if (file == null || file.Length == 0)
                 return BadRequest("No file uploaded");
 

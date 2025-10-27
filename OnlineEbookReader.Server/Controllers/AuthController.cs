@@ -8,7 +8,7 @@ using OnlineEbookReader.Server.Models;
 using static BCrypt.Net.BCrypt;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -29,8 +29,8 @@ public class AuthController : ControllerBase
         {
             return BadRequest("incorrect username or password");
         }
-        
-        
+
+
         if (Verify(user.Password, dbUser.PassowrdHash) )
         {
             var token = GenerateJwtToken(user.Name);
@@ -53,17 +53,17 @@ public class AuthController : ControllerBase
             .ToArray()
             .DefaultIfEmpty(0)
             .Max();
-        
+
         if (dbUser != null)
         {
             return BadRequest("User already exists");
         }
-        
-        var hash = HashPassword(user.Password ); 
+
+        var hash = HashPassword(user.Password );
         dbUser = new User { Id = lastId + 1, Name = user.Name, PassowrdHash = hash };
         _context.Users.Add(dbUser);
         _context.SaveChanges();
-        
+
         return Ok($"Created {user.Name}");
     }
 
