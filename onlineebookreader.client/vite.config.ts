@@ -1,4 +1,3 @@
-import { fileURLToPath, URL } from 'node:url';
 
 import tailwindcss from '@tailwindcss/vite';
 import plugin from '@vitejs/plugin-react';
