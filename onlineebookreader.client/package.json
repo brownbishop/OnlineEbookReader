@@ -11,17 +11,22 @@
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
     "epubjs": "^0.3.93",
+    "lucide-react": "^0.552.0",
     "react": "^19.2.0",
     "react-dom": "^19.1.1",
     "react-reader": "^2.0.15",
     "react-router-dom": "^7.9.4",
     "reader": "^0.0.8",
-    "tailwindcss": "^4.1.14"
+    "tailwind-merge": "^3.3.1",
+    "tailwindcss": "^4.1.14",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@eslint/js": "^9.36.0",
-    "@types/node": "^24.6.0",
+    "@types/node": "^24.9.2",
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",

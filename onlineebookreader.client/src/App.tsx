@@ -10,8 +10,8 @@ interface Forecast {
 }
 
 function App() {
-    const url = "https://react-reader.metabits.no/files/alice.epub"; 
-    const title = "Alice in wonderland"; 
+    const url = "https://react-reader.metabits.no/files/alice.epub";
+    const title = "Alice in wonderland";
     const [forecasts, setForecasts] = useState<Forecast[]>();
 
     useEffect(() => {
@@ -53,7 +53,7 @@ function App() {
     );
 
     async function populateWeatherData() {
-        const response = await fetch('weatherforecast');
+        const response = await fetch('api/weatherforecast');
         if (response.ok) {
             const data = await response.json();
             setForecasts(data);
