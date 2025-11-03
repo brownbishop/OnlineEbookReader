@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router';
+import {useEffect, useState} from 'react';
+import {Link} from 'react-router';
 import './App.css';
+import {Navbar01, type Navbar01Props} from './components/ui/shadcn-io/navbar-01';
 
 interface Forecast {
     date: string;
@@ -8,6 +9,18 @@ interface Forecast {
     temperatureF: number;
     summary: string;
 }
+
+const navbarProps: Navbar01Props = {
+    logo: null,
+    logoHref: "",
+    navigationLinks: undefined,
+    signInText: "Sign in",
+    signInHref: "/signin",
+    ctaText: "Log in",
+    ctaHref: "/login",
+    onSignInClick: undefined,
+    onCtaClick: undefined,
+};
 
 function App() {
     const url = "https://react-reader.metabits.no/files/alice.epub";
@@ -42,14 +55,17 @@ function App() {
         </table>;
 
     return (
-        <div>
-            <h1 id="tableLabel">Weather forecast</h1>
-            <p>This component demonstrates fetching data from the server.</p>
-            {contents}
-            <Link to={`/reader/?url=${url}&title=${title}`}>
-            Alice in Wonderland
-            </Link>
-        </div>
+        <>
+            <Navbar01 {...navbarProps}> Navbar </Navbar01>
+            <div>
+                <h1 id="tableLabel">Weather forecast</h1>
+                <p>This component demonstrates fetching data from the server.</p>
+                {contents}
+                <Link to={`/reader/?url=${url}&title=${title}`}>
+                    Alice in Wonderland
+                </Link>
+            </div>
+        </>
     );
 
     async function populateWeatherData() {

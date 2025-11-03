@@ -1,3 +1,5 @@
+@import "./index.css";
+@import "./styles/globals.css";
 @import "tailwindcss";
 
 @plugin "tailwindcss-animate";
@@ -6,11 +8,9 @@
 @custom-variant dark (&:is(.dark *));
 
 #root {
-    /* max-width: 1280px; */
-    margin: 0 auto;
-    /* padding: 2rem; */
-    text-align: center;
+    width: 100%;
 }
+
 
 th, td {
     padding-left: 1rem;
@@ -130,5 +130,6 @@ th, td {
     }
   body {
     @apply bg-background text-foreground;
+    min-height: 100vh;
     }
 }

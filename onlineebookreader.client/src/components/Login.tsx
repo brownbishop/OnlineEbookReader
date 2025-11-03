@@ -64,9 +64,10 @@ function Login() {
     }
 
     return (
-        <div className="w-full max-w-sm">
-            <Form {...form}>
-                <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <div className="flex min-h-screen items-center justify-center">
+            <div className="w-full max-w-sm">
+                <Form {...form}>
+                    <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
                     <div className="space-y-2 text-center">
                         <h1 className="font-bold text-2xl">Welcome back</h1>
                         <p className="text-muted-foreground text-sm">
@@ -126,8 +127,9 @@ function Login() {
                             Sign up
                         </a>
                     </p>
-                </form>
-            </Form>
+                    </form>
+                </Form>
+            </div>
         </div>
     );
 };
