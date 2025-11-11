@@ -8,5 +8,6 @@
         public string Description { get; set; } = "";
         public string CoverImageUrl { get; set; } = "";
         public string FileUrl { get; set; } = "";
+        public string Progress { get; set; } = "";
     }
 }
