@@ -4,7 +4,8 @@ import {BrowserRouter, Routes, Route} from 'react-router-dom'
 import Reader from '@/components/Reader'
 import Login from '@/components/Login'
 import './styles/globals.css'
-import Signup from './components/Signup.tsx'
+import Signup from '@/components/Signup.tsx'
+import UploadBook from './components/UploadBook.tsx'
 
 createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
@@ -13,6 +14,7 @@ createRoot(document.getElementById('root')!).render(
             <Route path="/reader" element={<Reader />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/upload" element={<UploadBook />} />
         </Routes>
     </BrowserRouter>,
 )

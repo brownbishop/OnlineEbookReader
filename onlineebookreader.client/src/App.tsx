@@ -1,15 +1,8 @@
 import {useEffect, useState} from 'react';
 import {Link, useNavigate} from 'react-router';
 import './App.css';
-import {Navbar01, type Navbar01Props} from './components/ui/shadcn-io/navbar-01';
-
-interface Forecast {
-    date: string;
-    temperatureC: number;
-    temperatureF: number;
-    summary: string;
-}
-
+import {Navbar01, type Navbar01Props, Logo} from '@/components/ui/shadcn-io/navbar-01';
+import BookLibrary from '@/components/BookLibrary';
 
 function App() {
     const url = "https://react-reader.metabits.no/files/alice.epub";
@@ -17,9 +10,7 @@ function App() {
     const navigate = useNavigate();
 
     const navbarProps: Navbar01Props = {
-        logo: null,
-        logoHref: "",
-        navigationLinks: [],
+        logo: <Logo />,
         signInText: "Sign in",
         signInHref: "/signin",
         ctaText: "Log in",
@@ -35,6 +26,8 @@ function App() {
                     Alice in Wonderland
                 </Link>
             </div>
+
+            <BookLibrary/>
         </>
     );
 
