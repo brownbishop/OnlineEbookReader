@@ -123,7 +123,7 @@ function Login() {
                     </Button>
                     <p className="text-center text-muted-foreground text-sm">
                         Don't have an account?{" "}
-                        <a className="hover:underline" href="#">
+                        <a className="hover:underline" href="/signup">
                             Sign up
                         </a>
                     </p>

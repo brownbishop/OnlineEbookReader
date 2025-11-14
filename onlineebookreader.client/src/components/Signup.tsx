@@ -139,13 +139,7 @@ function Signup() {
                         <Button className="w-full" type="submit">
                             Sign Up
                         </Button>
-                        <p className="text-center text-muted-foreground text-sm">
-                            Don't have an account?{" "}
-                            <a className="hover:underline" href="#">
-                                Sign up
-                            </a>
-                        </p>
-                    </form>
+                        </form>
                 </Form>
             </div>
         </div>
