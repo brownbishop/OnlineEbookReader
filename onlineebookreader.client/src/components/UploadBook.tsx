@@ -56,7 +56,7 @@ export default function UploadBook() {
             setSelectedFile(null);
 
             // Redirect to books immediately (uploadBook already refetches books)
-            navigate('/books');
+            navigate('/library');
         } catch (err) {
             setUploadProgress(0);
             // Error is already set by uploadBook in the store

@@ -9,6 +9,7 @@ import Signup from '@/components/Signup.tsx'
 import UploadBook from './components/UploadBook.tsx'
 import { useAppState } from '@/lib/store'
 import BookLibrary from './components/BookLibrary.tsx'
+import LandingPage from './components/LandingPage.tsx'
 
 function RootComponent() {
     const initializeAuth = useAppState(state => state.initializeAuth)
@@ -20,12 +21,13 @@ function RootComponent() {
     return (
         <BrowserRouter>
             <Routes>
-                <Route path="/" element={<App />} />
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/home" element={<App />} />
                 <Route path="/reader" element={<Reader />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/upload" element={<UploadBook />} />
-                <Route path="/books" element={<BookLibrary />} />
+                <Route path="/library" element={<BookLibrary />} />
             </Routes>
         </BrowserRouter>
     )
