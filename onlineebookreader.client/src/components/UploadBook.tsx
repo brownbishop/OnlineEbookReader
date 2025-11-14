@@ -151,7 +151,7 @@ export default function UploadBook() {
 
                         {/* Selected File Info */}
                         {selectedFile && (
-                            <div className="bg-secondary/50 rounded-lg p-4 space-y-2">
+                            <div className="bg-amber-100 dark:bg-amber-950 rounded-lg p-4 space-y-2">
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <p className="font-semibold text-sm">{selectedFile.name}</p>
@@ -181,9 +181,9 @@ export default function UploadBook() {
                                     <span className="text-sm font-medium">Uploading...</span>
                                     <span className="text-sm text-muted-foreground">{uploadProgress}%</span>
                                 </div>
-                                <div className="w-full bg-secondary rounded-full h-2">
+                                <div className="w-full bg-amber-200 dark:bg-amber-900 rounded-full h-2">
                                     <div
-                                        className="bg-primary rounded-full h-2 transition-all"
+                                        className="bg-amber-700 rounded-full h-2 transition-all"
                                         style={{ width: `${uploadProgress}%` }}
                                     />
                                 </div>

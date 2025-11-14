@@ -324,9 +324,9 @@ export default function BookLibrary() {
                                                     <span className="text-xs text-muted-foreground">Progress</span>
                                                     <span className="text-xs font-semibold">{book.progress}%</span>
                                                 </div>
-                                                <div className="w-full bg-secondary rounded-full h-2">
+                                                <div className="w-full bg-amber-200 dark:bg-amber-900 rounded-full h-2">
                                                     <div
-                                                        className="bg-primary rounded-full h-2 transition-all"
+                                                        className="bg-amber-700 rounded-full h-2 transition-all"
                                                         style={{
                                                             width: `${Math.min(parseInt(book.progress) || 0, 100)}%`,
                                                         }}

@@ -60,7 +60,7 @@ function Login() {
             console.log(err);
         }
 
-        navigate("/");
+        navigate("/library");
     }
 
     return (

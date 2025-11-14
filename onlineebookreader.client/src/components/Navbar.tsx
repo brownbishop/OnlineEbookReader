@@ -234,16 +234,16 @@ export const Navbar01 = React.forwardRef<HTMLElement, Navbar01Props>(
                    <User className="w-4 h-4" />
                    {currentUser}
                  </div>
-                 <Button
-                   size="sm"
-                   className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-                   onClick={(e) => {
-                     e.preventDefault();
-                     if (onLogout) onLogout();
-                   }}
-                 >
-                   Logout
-                 </Button>
+                  <Button
+                    size="sm"
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm bg-amber-700 hover:bg-amber-800 text-white"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (onLogout) onLogout();
+                    }}
+                  >
+                    Logout
+                  </Button>
                </>
              ) : (
                <>
@@ -258,16 +258,16 @@ export const Navbar01 = React.forwardRef<HTMLElement, Navbar01Props>(
                  >
                    {signInText}
                  </Button>
-                 <Button
-                   size="sm"
-                   className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
-                   onClick={(e) => {
-                     e.preventDefault();
-                     if (onCtaClick) onCtaClick();
-                   }}
-                 >
-                   {ctaText}
-                 </Button>
+                  <Button
+                    size="sm"
+                    className="text-sm font-medium px-4 h-9 rounded-md shadow-sm bg-amber-700 hover:bg-amber-800 text-white"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      if (onCtaClick) onCtaClick();
+                    }}
+                  >
+                    {ctaText}
+                  </Button>
                </>
              )}
            </div>
