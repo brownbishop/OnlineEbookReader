@@ -1,4 +1,4 @@
-﻿using System.Security.Claims;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -253,7 +253,7 @@ namespace OnlineEbookReader.Server.Controllers
 
             _context.Books.Add(book);
             user.BookIds = user.BookIds.Append(book.Id).ToArray();
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return Ok(new {file.Name, file.Length});
         }
 
