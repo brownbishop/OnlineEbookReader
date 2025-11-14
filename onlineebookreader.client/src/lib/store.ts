@@ -39,6 +39,7 @@ interface AppState {
     fetchBookById: (id: number) => Promise<void>;
     syncBookProgress: (id: number, progress: string) => Promise<void>;
     uploadBook: (file: File) => Promise<Book>;
+    deleteBook: (id: number) => Promise<void>;
 }
 
 export const useAppState = create<AppState>()((set, get) => ({
@@ -218,6 +219,40 @@ export const useAppState = create<AppState>()((set, get) => ({
             // Return the book if available from the response
             const data = await response.json();
             return data as Book;
+        } catch (error) {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            set(() => ({ error: errorMessage, isLoading: false }));
+            throw error;
+        }
+    },
+
+    deleteBook: async (id: number) => {
+        const state = get();
+        if (!state.token) {
+            set(() => ({ error: 'No auth token available' }));
+            return;
+        }
+
+        set(() => ({ isLoading: true, error: null }));
+        try {
+            const response = await fetch(`https://localhost:55942/api/books/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${state.token}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to delete book: ${response.statusText}`);
+            }
+
+            // Remove book from state
+            set((state) => ({
+                books: state.books.filter((book) => book.id !== id),
+                currentBook: state.currentBook?.id === id ? null : state.currentBook,
+                isLoading: false,
+            }));
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : 'Unknown error';
             set(() => ({ error: errorMessage, isLoading: false }));

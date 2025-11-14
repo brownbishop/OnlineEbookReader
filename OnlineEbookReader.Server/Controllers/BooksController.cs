@@ -257,5 +257,52 @@ namespace OnlineEbookReader.Server.Controllers
             return Ok(new {file.Name, file.Length});
         }
 
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return BadRequest("current user is not found");
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("failed to find user in database");
+            }
+
+            var book = _context.Books.Find(id);
+            if (book == null)
+            {
+                return BadRequest("Book not found");
+            }
+
+            if (!user.BookIds.Contains(book.Id))
+            {
+                return BadRequest("current user doesn't own book");
+            }
+
+            // Delete the book files
+            if (!string.IsNullOrEmpty(book.FileUrl) && System.IO.File.Exists(book.FileUrl))
+            {
+                System.IO.File.Delete(book.FileUrl);
+            }
+
+            if (!string.IsNullOrEmpty(book.CoverImageUrl) && System.IO.File.Exists(book.CoverImageUrl))
+            {
+                System.IO.File.Delete(book.CoverImageUrl);
+            }
+
+            // Remove book from user's collection
+            user.BookIds = user.BookIds.Where(x => x != id).ToArray();
+
+            // Delete book from database
+            _context.Books.Remove(book);
+            await _context.SaveChangesAsync();
+
+            return Ok("Book deleted successfully");
+        }
+
     }
 }

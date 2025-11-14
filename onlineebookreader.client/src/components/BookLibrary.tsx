@@ -5,6 +5,7 @@ import {Button} from '@/components/ui/button';
 import {Input} from '@/components/ui/input';
 import {useNavigate, useLocation} from 'react-router-dom';
 import {Navbar01, type Navbar01Props, Logo} from '@/components/Navbar';
+import {Trash2} from 'lucide-react';
 
 export default function BookLibrary() {
     const navigate = useNavigate();
@@ -19,11 +20,13 @@ export default function BookLibrary() {
         currentUser,
         logout,
         initializeAuth,
+        deleteBook,
     } = useAppState();
 
     const [searchQuery, setSearchQuery] = useState('');
     const [filterBy, setFilterBy] = useState<'all' | 'reading' | 'completed'>('all');
     const [coverImageUrls, setCoverImageUrls] = useState<Record<number, string>>({});
+    const [deleteConfirm, setDeleteConfirm] = useState<number | null>(null);
     const blobUrlsRef = useRef<Record<number, string>>({});
 
     useEffect(() => {
@@ -121,6 +124,15 @@ export default function BookLibrary() {
             setCurrentBook(book);
             // Navigate to reader with book ID for JWT authentication
             navigate(`/reader?bookId=${bookId}&title=${encodeURIComponent(book.title)}`);
+        }
+    };
+
+    const handleDeleteBook = async (bookId: number) => {
+        try {
+            await deleteBook(bookId);
+            setDeleteConfirm(null);
+        } catch (error) {
+            console.error('Failed to delete book:', error);
         }
     };
 
@@ -334,12 +346,46 @@ export default function BookLibrary() {
                                                 </div>
                                             </div>
                                         )}
-                                        <Button
-                                            onClick={() => handleReadBook(book.id)}
-                                            className="w-full"
-                                        >
-                                            {book.progress ? 'Continue Reading' : 'Start Reading'}
-                                        </Button>
+                                        {deleteConfirm === book.id ? (
+                                            <div className="w-full space-y-2">
+                                                <p className="text-sm font-medium text-destructive">Delete this book?</p>
+                                                <div className="flex gap-2">
+                                                    <Button
+                                                        variant="destructive"
+                                                        size="sm"
+                                                        className="flex-1"
+                                                        onClick={() => handleDeleteBook(book.id)}
+                                                    >
+                                                        Delete
+                                                    </Button>
+                                                    <Button
+                                                        variant="outline"
+                                                        size="sm"
+                                                        className="flex-1"
+                                                        onClick={() => setDeleteConfirm(null)}
+                                                    >
+                                                        Cancel
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="flex gap-2">
+                                                <Button
+                                                    onClick={() => handleReadBook(book.id)}
+                                                    className="flex-1"
+                                                >
+                                                    {book.progress ? 'Continue Reading' : 'Start Reading'}
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="sm"
+                                                    className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                                                    onClick={() => setDeleteConfirm(book.id)}
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </Button>
+                                            </div>
+                                        )}
                                     </CardFooter>
                                 </Card>
                             ))}
