@@ -8,6 +8,7 @@ import './styles/globals.css'
 import Signup from '@/components/Signup.tsx'
 import UploadBook from './components/UploadBook.tsx'
 import { useAppState } from '@/lib/store'
+import BookLibrary from './components/BookLibrary.tsx'
 
 function RootComponent() {
     const initializeAuth = useAppState(state => state.initializeAuth)
@@ -24,6 +25,7 @@ function RootComponent() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<Signup />} />
                 <Route path="/upload" element={<UploadBook />} />
+                <Route path="/books" element={<BookLibrary />} />
             </Routes>
         </BrowserRouter>
     )
