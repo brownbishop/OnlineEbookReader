@@ -55,10 +55,8 @@ export default function UploadBook() {
             setUploadSuccess(true);
             setSelectedFile(null);
 
-            // Reset form and redirect after 2 seconds
-            setTimeout(() => {
-                navigate('/books');
-            }, 2000);
+            // Redirect to books immediately (uploadBook already refetches books)
+            navigate('/books');
         } catch (err) {
             setUploadProgress(0);
             // Error is already set by uploadBook in the store

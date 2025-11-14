@@ -3,10 +3,11 @@ import { useAppState } from '@/lib/store';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export default function BookLibrary() {
     const navigate = useNavigate();
+    const location = useLocation();
     const {
         books,
         isLoading,
@@ -19,11 +20,11 @@ export default function BookLibrary() {
     const [searchQuery, setSearchQuery] = useState('');
     const [filterBy, setFilterBy] = useState<'all' | 'reading' | 'completed'>('all');
     const [coverImageUrls, setCoverImageUrls] = useState<Record<number, string>>({});
-    // const blobUrlsRef = useRef<Record<number, string>>({});
+    const blobUrlsRef = useRef<Record<number, string>>({});
 
     useEffect(() => {
         fetchBooks();
-    }, [fetchBooks]);
+    }, [location.pathname, fetchBooks]);
 
     // Fetch cover images with JWT authentication
     useEffect(() => {
@@ -31,13 +32,13 @@ export default function BookLibrary() {
 
         const fetchCoverImages = async () => {
             const newCoverUrls: Record<number, string> = {};
-            // const newBlobUrls: Record<number, string> = {};
+            const newBlobUrls: Record<number, string> = {};
 
             // Clean up old blob URLs
-            // Object.values(blobUrlsRef.current).forEach(url => {
-            //     URL.revokeObjectURL(url);
-            // });
-            // blobUrlsRef.current = {};
+            Object.values(blobUrlsRef.current).forEach(url => {
+                URL.revokeObjectURL(url);
+            });
+            blobUrlsRef.current = {};
 
             // Fetch images for books that have coverImageUrl
             const booksWithCovers = books.filter(book => book.coverImageUrl);
@@ -59,7 +60,7 @@ export default function BookLibrary() {
                             const blob = await response.blob();
                             const blobUrl = URL.createObjectURL(blob);
                             newCoverUrls[book.id] = blobUrl;
-                            // newBlobUrls[book.id] = blobUrl;
+                            newBlobUrls[book.id] = blobUrl;
                         }
                     } catch (error) {
                         console.error(`Failed to fetch cover for book ${book.id}:`, error);
@@ -67,7 +68,7 @@ export default function BookLibrary() {
                 })
             );
 
-            // blobUrlsRef.current = newBlobUrls;
+            blobUrlsRef.current = newBlobUrls;
             setCoverImageUrls(newCoverUrls);
         };
 
@@ -75,10 +76,10 @@ export default function BookLibrary() {
 
         // Cleanup function to revoke blob URLs when component unmounts
         return () => {
-            // Object.values(blobUrlsRef.current).forEach(url => {
-            //     URL.revokeObjectURL(url);
-            // });
-            // blobUrlsRef.current = {};
+            Object.values(blobUrlsRef.current).forEach(url => {
+                URL.revokeObjectURL(url);
+            });
+            blobUrlsRef.current = {};
         };
     }, [books, token]);
 
