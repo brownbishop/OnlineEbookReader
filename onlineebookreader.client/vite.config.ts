@@ -58,10 +58,6 @@ export default defineConfig({
             '^/swagger': {
                 target,
                 secure: false,
-            },
-            '^/books': {
-                target,
-                secure: false,
             }
         },
         port: parseInt(env.DEV_SERVER_PORT || '55942'),
