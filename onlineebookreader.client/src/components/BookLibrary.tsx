@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useRef } from 'react';
 import { useAppState } from '@/lib/store';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -13,14 +13,74 @@ export default function BookLibrary() {
         error,
         fetchBooks,
         setCurrentBook,
+        token,
     } = useAppState();
 
     const [searchQuery, setSearchQuery] = useState('');
     const [filterBy, setFilterBy] = useState<'all' | 'reading' | 'completed'>('all');
+    const [coverImageUrls, setCoverImageUrls] = useState<Record<number, string>>({});
+    // const blobUrlsRef = useRef<Record<number, string>>({});
 
     useEffect(() => {
         fetchBooks();
-    }, []);
+    }, [fetchBooks]);
+
+    // Fetch cover images with JWT authentication
+    useEffect(() => {
+        if (!token || books.length === 0) return;
+
+        const fetchCoverImages = async () => {
+            const newCoverUrls: Record<number, string> = {};
+            // const newBlobUrls: Record<number, string> = {};
+
+            // Clean up old blob URLs
+            // Object.values(blobUrlsRef.current).forEach(url => {
+            //     URL.revokeObjectURL(url);
+            // });
+            // blobUrlsRef.current = {};
+
+            // Fetch images for books that have coverImageUrl
+            const booksWithCovers = books.filter(book => book.coverImageUrl);
+
+            await Promise.all(
+                booksWithCovers.map(async (book) => {
+                    try {
+                        const response = await fetch(
+                            `https://localhost:55942/api/books/downloadcover/${book.id}`,
+                            {
+                                method: 'GET',
+                                headers: {
+                                    'Authorization': `Bearer ${token}`,
+                                },
+                            }
+                        );
+
+                        if (response.ok) {
+                            const blob = await response.blob();
+                            const blobUrl = URL.createObjectURL(blob);
+                            newCoverUrls[book.id] = blobUrl;
+                            // newBlobUrls[book.id] = blobUrl;
+                        }
+                    } catch (error) {
+                        console.error(`Failed to fetch cover for book ${book.id}:`, error);
+                    }
+                })
+            );
+
+            // blobUrlsRef.current = newBlobUrls;
+            setCoverImageUrls(newCoverUrls);
+        };
+
+        fetchCoverImages().then().catch();
+
+        // Cleanup function to revoke blob URLs when component unmounts
+        return () => {
+            // Object.values(blobUrlsRef.current).forEach(url => {
+            //     URL.revokeObjectURL(url);
+            // });
+            // blobUrlsRef.current = {};
+        };
+    }, [books, token]);
 
     // Filter and search books
     const filteredBooks = useMemo(() => {
@@ -202,9 +262,9 @@ export default function BookLibrary() {
                             <Card key={book.id} className="flex flex-col overflow-hidden hover:shadow-lg transition-shadow">
                                 {/* Book Cover */}
                                 <div className="relative h-48 bg-muted overflow-hidden">
-                                    {book.coverImageUrl ? (
+                                    {book.coverImageUrl && coverImageUrls[book.id] ? (
                                         <img
-                                            src={`https://localhost:55942/api/books/downloadcover/${book.id}`}
+                                            src={coverImageUrls[book.id]}
                                             alt={book.title}
                                             className="w-full h-full object-cover"
                                         />
