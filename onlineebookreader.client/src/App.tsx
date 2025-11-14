@@ -1,13 +1,18 @@
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {Link, useNavigate} from 'react-router';
 import './App.css';
-import {Navbar01, type Navbar01Props, Logo} from '@/components/ui/shadcn-io/navbar-01';
-import BookLibrary from '@/components/BookLibrary';
+import {Navbar01, type Navbar01Props, Logo} from '@/components/Navbar';
+import {useAppState} from '@/lib/store';
 
 function App() {
     const url = "https://react-reader.metabits.no/files/alice.epub";
     const title = "Alice in wonderland";
     const navigate = useNavigate();
+    const {currentUser, logout, initializeAuth} = useAppState();
+
+    useEffect(() => {
+        initializeAuth();
+    }, [initializeAuth]);
 
     const navbarProps: Navbar01Props = {
         logo: <Logo />,
@@ -17,6 +22,11 @@ function App() {
         ctaHref: "/login",
         onSignInClick: () => navigate("/signin"),
         onCtaClick: () => navigate("/login"),
+        currentUser: currentUser || null,
+        onLogout: () => {
+            logout();
+            navigate("/");
+        },
     };
     return (
         <>
@@ -27,7 +37,6 @@ function App() {
                 </Link>
             </div>
 
-            <BookLibrary/>
         </>
     );
 

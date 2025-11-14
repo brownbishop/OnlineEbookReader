@@ -1,228 +1,283 @@
-import { Book, Menu, Sunset, Trees, Zap } from "lucide-react";
+'use client';
 
+import {Button} from '@/components/ui/button';
 import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Button } from "@/components/ui/button";
+    NavigationMenu,
+    NavigationMenuItem,
+    NavigationMenuList
+} from '@/components/ui/navigation-menu';
 import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import {cn} from '@/lib/utils';
+import {User} from 'lucide-react';
+import * as React from 'react';
+import {useEffect, useRef, useState} from 'react';
 
-interface MenuItem {
-  title: string;
-  url: string;
-  description?: string;
-  icon?: React.ReactNode;
-  items?: MenuItem[];
-}
-
-interface NavbarProps {
-  logo?: {
-    url: string;
-    src: string;
-    alt: string;
-    title: string;
-  };
-  menu?: MenuItem[];
-  auth?: {
-    login: {
-      title: string;
-      url: string;
-    };
-    signup: {
-      title: string;
-      url: string;
-    };
-  };
-}
-
-const Navbar = ({
-  logo = {
-    url: "https://www.shadcnblocks.com",
-    src: "https://deifkwefumgah.cloudfront.net/shadcnblocks/block/logos/shadcnblockscom-icon.svg",
-    alt: "logo",
-    title: "Shadcnblocks.com",
-  },
-  menu = [],
-  auth = {
-    login: { title: "Login", url: "/login" },
-    signup: { title: "Sign up", url: "#" },
-  },
-}: NavbarProps) => {
+// Simple logo component for the navbar
+const Logo = (props: React.SVGAttributes<SVGElement>) => {
   return (
-    <section className="py-4">
-      <div className="container">
-        {/* Desktop Menu */}
-        <nav className="hidden items-center justify-between lg:flex">
-          <div className="flex items-center gap-6">
-            {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
-              />
-              <span className="text-lg font-semibold tracking-tighter">
-                {logo.title}
-              </span>
-            </a>
-            <div className="flex items-center">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  {menu.map((item) => renderMenuItem(item))}
+    <svg width='1em' height='1em' viewBox='0 0 324 323' fill='currentColor' xmlns='http://www.w3.org/2000/svg' {...props}>
+      <rect
+        x='88.1023'
+        y='144.792'
+        width='151.802'
+        height='36.5788'
+        rx='18.2894'
+        transform='rotate(-38.5799 88.1023 144.792)'
+        fill='currentColor'
+      />
+      <rect
+        x='85.3459'
+        y='244.537'
+        width='151.802'
+        height='36.5788'
+        rx='18.2894'
+        transform='rotate(-38.5799 85.3459 244.537)'
+        fill='currentColor'
+      />
+    </svg>
+  );
+};
+
+// Hamburger icon component
+const HamburgerIcon = ({ className, ...props }: React.SVGAttributes<SVGElement>) => (
+  <svg
+    className={cn('pointer-events-none', className)}
+    width={16}
+    height={16}
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    xmlns="http://www.w3.org/2000/svg"
+    {...props}
+  >
+    <path
+      d="M4 12L20 12"
+      className="origin-center -translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-x-0 group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[315deg]"
+    />
+    <path
+      d="M4 12H20"
+      className="origin-center transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.8)] group-aria-expanded:rotate-45"
+    />
+    <path
+      d="M4 12H20"
+      className="origin-center translate-y-[7px] transition-all duration-300 ease-[cubic-bezier(.5,.85,.25,1.1)] group-aria-expanded:translate-y-0 group-aria-expanded:rotate-[135deg]"
+    />
+  </svg>
+);
+
+// Types
+export interface Navbar01NavLink {
+  href: string;
+  label: string;
+  active?: boolean;
+}
+
+export interface Navbar01Props extends React.HTMLAttributes<HTMLElement> {
+  logo?: React.ReactNode;
+  logoHref?: string;
+  navigationLinks?: Navbar01NavLink[];
+  signInText?: string;
+  signInHref?: string;
+  ctaText?: string;
+  ctaHref?: string;
+  onSignInClick?: () => void;
+  onCtaClick?: () => void;
+  currentUser?: string | null;
+  onLogout?: () => void;
+}
+
+// Default navigation links
+const defaultNavigationLinks: Navbar01NavLink[] = [];
+
+export const Navbar01 = React.forwardRef<HTMLElement, Navbar01Props>(
+  (
+    {
+      className,
+      logo = <Logo />,
+      navigationLinks = defaultNavigationLinks,
+      signInText = 'Sign In',
+      ctaText = 'Get Started',
+      onSignInClick,
+      onCtaClick,
+      currentUser = null,
+      onLogout,
+      ...props
+    },
+    ref
+  ) => {
+    const [isMobile, setIsMobile] = useState(false);
+    const containerRef = useRef<HTMLElement>(null);
+
+    useEffect(() => {
+      const checkWidth = () => {
+        if (containerRef.current) {
+          const width = containerRef.current.offsetWidth;
+          setIsMobile(width < 768); // 768px is md breakpoint
+        }
+      };
+
+      checkWidth();
+
+      const resizeObserver = new ResizeObserver(checkWidth);
+      if (containerRef.current) {
+        resizeObserver.observe(containerRef.current);
+      }
+
+      return () => {
+        resizeObserver.disconnect();
+      };
+    }, []);
+
+    // Combine refs
+    const combinedRef = React.useCallback((node: HTMLElement | null) => {
+      containerRef.current = node;
+      if (typeof ref === 'function') {
+        ref(node);
+      } else if (ref) {
+        ref.current = node;
+      }
+    }, [ref]);
+
+    return (
+      <header
+        ref={combinedRef}
+        className={cn(
+          'sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 md:px-6 [&_*]:no-underline',
+          className
+        )}
+        {...props}
+      >
+        <div className="container mx-auto flex h-16 max-w-screen-2xl items-center justify-between gap-4">
+          {/* Left side */}
+          <div className="flex items-center gap-2">
+            {/* Mobile menu trigger */}
+            {isMobile && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    className="group h-9 w-9 hover:bg-accent hover:text-accent-foreground"
+                    variant="ghost"
+                    size="icon"
+                  >
+                    <HamburgerIcon />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-48 p-2">
+                <NavigationMenu className="max-w-none">
+                  <NavigationMenuList className="flex-col items-start gap-1">
+                    {navigationLinks.map((link, index) => (
+                      <NavigationMenuItem key={index} className="w-full">
+                        <button
+                          onClick={(e) => e.preventDefault()}
+                          className={cn(
+                            "flex w-full items-center rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer no-underline",
+                            link.active
+                              ? "bg-accent text-accent-foreground"
+                              : "text-foreground/80"
+                          )}
+                        >
+                          {link.label}
+                        </button>
+                      </NavigationMenuItem>
+                    ))}
+                  </NavigationMenuList>
+                </NavigationMenu>
+                </PopoverContent>
+              </Popover>
+            )}
+              {/* Main nav */}
+              <div className="flex items-center gap-6">
+                <a
+                  href="/"
+                  className="flex items-center space-x-2 text-primary hover:text-primary/90 transition-colors cursor-pointer"
+                >
+                  <div className="text-2xl">
+                    {logo}
+                  </div>
+                </a>
+              {/* Navigation menu */}
+              {!isMobile && (
+                <NavigationMenu className="flex">
+                <NavigationMenuList className="gap-1">
+                  {navigationLinks.map((link, index) => (
+                    <NavigationMenuItem key={index}>
+                      <button
+                        onClick={(e) => e.preventDefault()}
+                        className={cn(
+                          "group inline-flex h-9 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground focus:outline-none disabled:pointer-events-none disabled:opacity-50 cursor-pointer no-underline",
+                          link.active
+                            ? "bg-accent text-accent-foreground"
+                            : "text-foreground/80 hover:text-foreground"
+                        )}
+                      >
+                        {link.label}
+                      </button>
+                    </NavigationMenuItem>
+                  ))}
                 </NavigationMenuList>
-              </NavigationMenu>
+                </NavigationMenu>
+              )}
             </div>
           </div>
-          <div className="flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <a href={auth.login.url}>{auth.login.title}</a>
-            </Button>
-            <Button asChild size="sm">
-              <a href={auth.signup.url}>{auth.signup.title}</a>
-            </Button>
-          </div>
-        </nav>
-
-        {/* Mobile Menu */}
-        <div className="block lg:hidden">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <a href={logo.url} className="flex items-center gap-2">
-              <img
-                src={logo.src}
-                className="max-h-8 dark:invert"
-                alt={logo.alt}
-              />
-            </a>
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="outline" size="icon">
-                  <Menu className="size-4" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent className="overflow-y-auto">
-                <SheetHeader>
-                  <SheetTitle>
-                    <a href={logo.url} className="flex items-center gap-2">
-                      <img
-                        src={logo.src}
-                        className="max-h-8 dark:invert"
-                        alt={logo.alt}
-                      />
-                    </a>
-                  </SheetTitle>
-                </SheetHeader>
-                <div className="flex flex-col gap-6 p-4">
-                  <Accordion
-                    type="single"
-                    collapsible
-                    className="flex w-full flex-col gap-4"
-                  >
-                    {menu.map((item) => renderMobileMenuItem(item))}
-                  </Accordion>
-
-                  <div className="flex flex-col gap-3">
-                    <Button asChild variant="outline">
-                      <a href={auth.login.url}>{auth.login.title}</a>
-                    </Button>
-                    <Button asChild>
-                      <a href={auth.signup.url}>{auth.signup.title}</a>
-                    </Button>
-                  </div>
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+           {/* Right side */}
+           <div className="flex items-center gap-3">
+             {currentUser ? (
+               <>
+                 <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                   <User className="w-4 h-4" />
+                   {currentUser}
+                 </div>
+                 <Button
+                   size="sm"
+                   className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
+                   onClick={(e) => {
+                     e.preventDefault();
+                     if (onLogout) onLogout();
+                   }}
+                 >
+                   Logout
+                 </Button>
+               </>
+             ) : (
+               <>
+                 <Button
+                   variant="ghost"
+                   size="sm"
+                   className="text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                   onClick={(e) => {
+                     e.preventDefault();
+                     if (onSignInClick) onSignInClick();
+                   }}
+                 >
+                   {signInText}
+                 </Button>
+                 <Button
+                   size="sm"
+                   className="text-sm font-medium px-4 h-9 rounded-md shadow-sm"
+                   onClick={(e) => {
+                     e.preventDefault();
+                     if (onCtaClick) onCtaClick();
+                   }}
+                 >
+                   {ctaText}
+                 </Button>
+               </>
+             )}
+           </div>
         </div>
-      </div>
-    </section>
-  );
-};
-
-const renderMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <NavigationMenuItem key={item.title}>
-        <NavigationMenuTrigger>{item.title}</NavigationMenuTrigger>
-        <NavigationMenuContent className="bg-popover text-popover-foreground">
-          {item.items.map((subItem) => (
-            <NavigationMenuLink asChild key={subItem.title} className="w-80">
-              <SubMenuLink item={subItem} />
-            </NavigationMenuLink>
-          ))}
-        </NavigationMenuContent>
-      </NavigationMenuItem>
+      </header>
     );
   }
+);
 
-  return (
-    <NavigationMenuItem key={item.title}>
-      <NavigationMenuLink
-        href={item.url}
-        className="bg-background hover:bg-muted hover:text-accent-foreground group inline-flex h-10 w-max items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors"
-      >
-        {item.title}
-      </NavigationMenuLink>
-    </NavigationMenuItem>
-  );
-};
+Navbar01.displayName = 'Navbar01';
 
-const renderMobileMenuItem = (item: MenuItem) => {
-  if (item.items) {
-    return (
-      <AccordionItem key={item.title} value={item.title} className="border-b-0">
-        <AccordionTrigger className="text-md py-0 font-semibold hover:no-underline">
-          {item.title}
-        </AccordionTrigger>
-        <AccordionContent className="mt-2">
-          {item.items.map((subItem) => (
-            <SubMenuLink key={subItem.title} item={subItem} />
-          ))}
-        </AccordionContent>
-      </AccordionItem>
-    );
-  }
+export {HamburgerIcon, Logo};
 
-  return (
-    <a key={item.title} href={item.url} className="text-md font-semibold">
-      {item.title}
-    </a>
-  );
-};
-
-const SubMenuLink = ({ item }: { item: MenuItem }) => {
-  return (
-    <a
-      className="hover:bg-muted hover:text-accent-foreground flex min-w-80 select-none flex-row gap-4 rounded-md p-3 leading-none no-underline outline-none transition-colors"
-      href={item.url}
-    >
-      <div className="text-foreground">{item.icon}</div>
-      <div>
-        <div className="text-sm font-semibold">{item.title}</div>
-        {item.description && (
-          <p className="text-muted-foreground text-sm leading-snug">
-            {item.description}
-          </p>
-        )}
-      </div>
-    </a>
-  );
-};
-
-export { Navbar as Navbar };
