@@ -16,6 +16,8 @@ interface AppState {
     setToken: (token: string) => void;
     currentUser: string;
     setCurrentUser: (user: string) => void;
+    initializeAuth: () => void;
+    logout: () => void;
 
     // Books state
     books: Book[];
@@ -42,9 +44,30 @@ interface AppState {
 export const useAppState = create<AppState>()((set, get) => ({
     // Auth state
     token: '',
-    setToken: (token: string) => set(() => ({ token })),
+    setToken: (token: string) => {
+        set(() => ({ token }));
+        localStorage.setItem('authToken', token);
+    },
     currentUser: '',
-    setCurrentUser: (user: string) => set(() => ({ currentUser: user })),
+    setCurrentUser: (user: string) => {
+        set(() => ({ currentUser: user }));
+        localStorage.setItem('currentUser', user);
+    },
+    initializeAuth: () => {
+        const savedToken = localStorage.getItem('authToken');
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedToken) {
+            set(() => ({ token: savedToken }));
+        }
+        if (savedUser) {
+            set(() => ({ currentUser: savedUser }));
+        }
+    },
+    logout: () => {
+        set(() => ({ token: '', currentUser: '' }));
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+    },
 
     // Books state
     books: [],
