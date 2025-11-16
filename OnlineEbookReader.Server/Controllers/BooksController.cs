@@ -304,5 +304,43 @@ namespace OnlineEbookReader.Server.Controllers
             return Ok("Book deleted successfully");
         }
 
+        [HttpPost("{id}/progress")]
+        public async Task<IActionResult> UpdateBookProgress(int id, [FromBody] ProgressRequest progressData)
+        {
+            var username = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (username == null)
+            {
+                return BadRequest("current user is not found");
+            }
+
+            var user = _context.Users.Where(x => x.Name == username).FirstOrDefault();
+            if (user == null)
+            {
+                return BadRequest("failed to find user in database");
+            }
+
+            var book = _context.Books.Find(id);
+            if (book == null)
+            {
+                return BadRequest("Book not found");
+            }
+
+            if (!user.BookIds.Contains(book.Id))
+            {
+                return BadRequest("current user doesn't own book");
+            }
+
+            try
+            {
+                book.Progress = progressData.Progress;
+                await _context.SaveChangesAsync();
+                return Ok(new { message = "Progress updated successfully", progress = book.Progress });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest($"Failed to update progress: {ex.Message}");
+            }
+        }
+
     }
 }
