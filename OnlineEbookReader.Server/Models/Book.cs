@@ -1,4 +1,4 @@
-﻿namespace OnlineEbookReader.Server.Models
+namespace OnlineEbookReader.Server.Models
 {
     public class Book
     {
@@ -8,6 +8,6 @@
         public string Description { get; set; } = "";
         public string CoverImageUrl { get; set; } = "";
         public string FileUrl { get; set; } = "";
-        public string Progress { get; set; } = "";
+        public decimal Progress { get; set; } = 0;
     }
 }

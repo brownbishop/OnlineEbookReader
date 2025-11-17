@@ -5,17 +5,17 @@
 namespace OnlineEbookReader.Server.Migrations
 {
     /// <inheritdoc />
-    public partial class AddBookProgress : Migration
+    public partial class AddBookProgressAsDecimal : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
+            migrationBuilder.AddColumn<decimal>(
                 name: "Progress",
                 table: "Books",
-                type: "text",
+                type: "numeric",
                 nullable: false,
-                defaultValue: "");
+                defaultValue: 0m);
         }
 
         /// <inheritdoc />

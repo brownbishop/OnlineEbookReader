@@ -45,9 +45,8 @@ namespace OnlineEbookReader.Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Progress")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("Progress")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Title")
                         .IsRequired()

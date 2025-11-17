@@ -44,15 +44,16 @@ namespace OnlineEbookReader.Server.Controllers
                 return [];
             }
 
-            var result = _context.Books.Select(x => new Book
-            {
-                Id = x.Id,
-                Title = x.Title,
-                Author = x.Author,
-                Description = x.Description,
-                CoverImageUrl = x.CoverImageUrl,
-                FileUrl = x.FileUrl,
-            }).ToArray().Where(x => user.BookIds.Contains(x.Id));
+             var result = _context.Books.Select(x => new Book
+             {
+                 Id = x.Id,
+                 Title = x.Title,
+                 Author = x.Author,
+                 Description = x.Description,
+                 CoverImageUrl = x.CoverImageUrl,
+                 FileUrl = x.FileUrl,
+                 Progress = x.Progress,
+             }).ToArray().Where(x => user.BookIds.Contains(x.Id));
 
             return result;
         }
@@ -169,6 +170,7 @@ namespace OnlineEbookReader.Server.Controllers
                 Description = x.Description,
                 CoverImageUrl = x.CoverImageUrl,
                 FileUrl = x.FileUrl,
+                Progress = x.Progress,
             }).ToArray();
 
             return books.Where(x =>

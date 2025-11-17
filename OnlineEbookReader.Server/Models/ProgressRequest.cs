@@ -2,6 +2,6 @@ namespace OnlineEbookReader.Server.Models
 {
     public class ProgressRequest
     {
-        public string Progress { get; set; } = "";
+        public decimal Progress { get; set; } = 0;
     }
 }

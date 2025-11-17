@@ -11,8 +11,8 @@ using OnlineEbookReader.Server.Data;
 namespace OnlineEbookReader.Server.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251110081949_AddBookProgress")]
-    partial class AddBookProgress
+    [Migration("20251116180735_AddBookProgressAsDecimal")]
+    partial class AddBookProgressAsDecimal
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -48,9 +48,8 @@ namespace OnlineEbookReader.Server.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Progress")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<decimal>("Progress")
+                        .HasColumnType("numeric");
 
                     b.Property<string>("Title")
                         .IsRequired()
