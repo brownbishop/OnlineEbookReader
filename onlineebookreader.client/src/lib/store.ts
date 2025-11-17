@@ -7,7 +7,7 @@ export interface Book {
     description: string;
     coverImageUrl: string;
     fileUrl: string;
-    progress: string;
+    progress: number;
 }
 
 interface AppState {
@@ -37,7 +37,7 @@ interface AppState {
     // Async actions
     fetchBooks: () => Promise<void>;
     fetchBookById: (id: number) => Promise<void>;
-    syncBookProgress: (id: number, progress: string) => Promise<void>;
+    syncBookProgress: (id: number, progress: number) => Promise<void>;
     uploadBook: (file: File) => Promise<Book>;
     deleteBook: (id: number) => Promise<void>;
 }
@@ -156,7 +156,7 @@ export const useAppState = create<AppState>()((set, get) => ({
         }
     },
 
-    syncBookProgress: async (id: number, progress: string) => {
+    syncBookProgress: async (id: number, progress: number) => {
         const state = get();
         if (!state.token) {
             set(() => ({ error: 'No auth token available' }));

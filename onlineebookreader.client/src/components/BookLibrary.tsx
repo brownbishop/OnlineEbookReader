@@ -108,10 +108,10 @@ export default function BookLibrary() {
 
             // Status filter
             if (filterBy === 'reading') {
-                return book.progress && parseInt(book.progress) > 0 && parseInt(book.progress) < 100;
+                return book.progress && book.progress > 0 && book.progress < 100;
             }
             if (filterBy === 'completed') {
-                return book.progress && parseInt(book.progress) === 100;
+                return book.progress && book.progress === 100;
             }
 
             return true;
@@ -197,6 +197,7 @@ export default function BookLibrary() {
         );
     }
 
+    console.log(books);
     return (
         <>
             <Navbar01 {...navbarProps} />
@@ -244,7 +245,7 @@ export default function BookLibrary() {
                                 size="sm"
                             >
                                 Currently Reading (
-                                {books.filter(b => b.progress && parseInt(b.progress) > 0 && parseInt(b.progress) < 100).length}
+                                {books.filter(b => b.progress && b.progress > 0 && b.progress < 100).length}
                                 )
                             </Button>
                             <Button
@@ -253,7 +254,7 @@ export default function BookLibrary() {
                                 size="sm"
                             >
                                 Completed (
-                                {books.filter(b => b.progress && parseInt(b.progress) === 100).length}
+                                {books.filter(b => b.progress && b.progress === 100).length}
                                 )
                             </Button>
                         </div>
@@ -336,13 +337,13 @@ export default function BookLibrary() {
                                                     <span className="text-xs text-muted-foreground">Progress</span>
                                                     <span className="text-xs font-semibold">{book.progress}%</span>
                                                 </div>
-                                                <div className="w-full bg-amber-200 dark:bg-amber-900 rounded-full h-2">
-                                                    <div
-                                                        className="bg-amber-700 rounded-full h-2 transition-all"
-                                                        style={{
-                                                            width: `${Math.min(parseInt(book.progress) || 0, 100)}%`,
-                                                        }}
-                                                    />
+                                                    <div className="w-full bg-amber-200 dark:bg-amber-900 rounded-full h-2">
+                                                        <div
+                                                            className="bg-amber-700 rounded-full h-2 transition-all"
+                                                            style={{
+                                                                width: `${Math.min(book.progress || 0, 100)}%`,
+                                                            }}
+                                                        />
                                                 </div>
                                             </div>
                                         )}
