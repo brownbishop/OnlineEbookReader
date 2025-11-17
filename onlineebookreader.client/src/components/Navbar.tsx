@@ -12,9 +12,10 @@ import {
     PopoverTrigger,
 } from '@/components/ui/popover';
 import {cn} from '@/lib/utils';
-import {User} from 'lucide-react';
+import {User, Moon, Sun} from 'lucide-react';
 import * as React from 'react';
 import {useEffect, useRef, useState} from 'react';
+import {useAppState} from '@/lib/store';
 
 // Simple logo component for the navbar
 const Logo = (props: React.SVGAttributes<SVGElement>) => {
@@ -114,6 +115,7 @@ export const Navbar01 = React.forwardRef<HTMLElement, Navbar01Props>(
   ) => {
     const [isMobile, setIsMobile] = useState(false);
     const containerRef = useRef<HTMLElement>(null);
+    const { theme, toggleTheme } = useAppState();
 
     useEffect(() => {
       const checkWidth = () => {
@@ -226,9 +228,17 @@ export const Navbar01 = React.forwardRef<HTMLElement, Navbar01Props>(
               )}
             </div>
           </div>
-           {/* Right side */}
-           <div className="flex items-center gap-3">
-             {currentUser ? (
+            {/* Right side */}
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={toggleTheme}
+                className="h-9 w-9"
+              >
+                {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </Button>
+              {currentUser ? (
                <>
                  <div className="flex items-center gap-2 text-sm font-medium text-foreground">
                    <User className="w-4 h-4" />

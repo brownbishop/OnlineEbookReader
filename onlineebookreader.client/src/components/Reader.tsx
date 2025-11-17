@@ -1,9 +1,10 @@
 import {useAppState} from '@/lib/store';
 import {Rendition} from 'epubjs';
 import {useCallback, useEffect, useRef, useState} from 'react';
-import {ReactReader} from 'react-reader';
+import {ReactReader, ReactReaderStyle, type IReactReaderStyle} from 'react-reader';
 import {useNavigate, useSearchParams} from 'react-router';
 import {Button} from '@/components/ui/button';
+import {Moon, Sun} from 'lucide-react';
 
 function Reader() {
     const navigate = useNavigate();
@@ -18,7 +19,7 @@ function Reader() {
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const toc = useRef<any[]>([]);
-    const {books, token, syncBookProgress} = useAppState();
+    const {books, token, syncBookProgress, theme, toggleTheme} = useAppState();
 
     const url: string = searchParams.get('url') || "";
     const bookId: string = searchParams.get('bookId') || "";
@@ -42,6 +43,67 @@ function Reader() {
         }
         return 0;
     }, []);
+
+    const updateTheme = (rendition: Rendition, theme: 'light' | 'dark') => {
+        const themes = rendition.themes;
+        switch (theme) {
+            case 'dark': {
+                themes.override('color', '#fff');
+                themes.override('background', '#1a1a1a');
+                break;
+            }
+            case 'light': {
+                themes.override('color', '#000');
+                themes.override('background', '#fff');
+                break;
+            }
+        }
+    };
+
+    const lightReaderTheme: IReactReaderStyle = {
+        ...ReactReaderStyle,
+        readerArea: {
+            ...ReactReaderStyle.readerArea,
+            transition: undefined,
+        },
+    };
+
+    const darkReaderTheme: IReactReaderStyle = {
+        ...ReactReaderStyle,
+        arrow: {
+            ...ReactReaderStyle.arrow,
+            color: 'white',
+        },
+        arrowHover: {
+            ...ReactReaderStyle.arrowHover,
+            color: '#ccc',
+        },
+        readerArea: {
+            ...ReactReaderStyle.readerArea,
+            backgroundColor: '#1a1a1a',
+            transition: undefined,
+        },
+        titleArea: {
+            ...ReactReaderStyle.titleArea,
+            color: '#ccc',
+        },
+        tocArea: {
+            ...ReactReaderStyle.tocArea,
+            background: '#111',
+        },
+        tocButtonExpanded: {
+            ...ReactReaderStyle.tocButtonExpanded,
+            background: '#222',
+        },
+        tocButtonBar: {
+            ...ReactReaderStyle.tocButtonBar,
+            background: '#fff',
+        },
+        tocButton: {
+            ...ReactReaderStyle.tocButton,
+            color: 'white',
+        },
+    };
 
     const handlePrev = () => {
         if (rendition.current) {
@@ -114,6 +176,12 @@ function Reader() {
         }
     }, [locationsReady, bookId, progress]);
 
+    useEffect(() => {
+        if (rendition.current) {
+            updateTheme(rendition.current, theme);
+        }
+    }, [theme]);
+
     return (<>
         <div className="relative w-screen h-screen" >
             {isLoading ? (
@@ -129,6 +197,7 @@ function Reader() {
                     tocChanged={(l) => toc.current = l}
                     showToc={true}
                     pageTurnOnScroll={true}
+                    readerStyles={theme === 'dark' ? darkReaderTheme : lightReaderTheme}
                     locationChanged={(loc: string) => {
                         setLocation(loc)
                         if (rendition.current && toc.current) {
@@ -161,6 +230,7 @@ function Reader() {
                     }}
                     getRendition={(r: Rendition) => {
                         rendition.current = r;
+                        updateTheme(r, theme);
                         r.book.locations.generate(1500).then(() => setLocationsReady(true));
                     }}
 
@@ -172,11 +242,16 @@ function Reader() {
             ))}
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 flex justify-between items-center p-1 bg-white border-t z-20">
-            <Button size="sm" onClick={() => navigate('/library')}>Back to Library</Button>
-            <div className="flex items-center space-x-1">
+        <div className="fixed bottom-0 left-0 right-0 flex justify-between items-center p-1 bg-white border-t z-20 dark:bg-gray-900 dark:border-gray-700">
+            <div className="flex items-center space-x-2">
+                <Button size="sm" onClick={() => navigate('/library')}>Back to Library</Button>
+                <Button size="sm" variant="ghost" onClick={toggleTheme}>
+                    {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                </Button>
+            </div>
+            <div className="flex items-center space-x-2">
                 <Button size="sm" onClick={handlePrev} disabled={currentPage <= 1}>Previous</Button>
-                <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                <span className="text-sm dark:text-white">Page {currentPage} of {totalPages}</span>
                 <Button size="sm" onClick={handleNext} disabled={currentPage >= totalPages}>Next</Button>
             </div>
         </div>

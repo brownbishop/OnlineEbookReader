@@ -13,10 +13,12 @@ import LandingPage from './components/LandingPage.tsx'
 
 function RootComponent() {
     const initializeAuth = useAppState(state => state.initializeAuth)
+    const initializeTheme = useAppState(state => state.initializeTheme)
 
     useEffect(() => {
         initializeAuth()
-    }, [initializeAuth])
+        initializeTheme()
+    }, [initializeAuth, initializeTheme])
 
     return (
         <BrowserRouter>

@@ -19,6 +19,12 @@ interface AppState {
     initializeAuth: () => void;
     logout: () => void;
 
+    // Theme state
+    theme: 'light' | 'dark';
+    setTheme: (theme: 'light' | 'dark') => void;
+    toggleTheme: () => void;
+    initializeTheme: () => void;
+
     // Books state
     books: Book[];
     currentBook: Book | null;
@@ -68,6 +74,24 @@ export const useAppState = create<AppState>()((set, get) => ({
         set(() => ({ token: '', currentUser: '' }));
         localStorage.removeItem('authToken');
         localStorage.removeItem('currentUser');
+    },
+
+    // Theme state
+    theme: 'light',
+    setTheme: (theme: 'light' | 'dark') => {
+        set(() => ({ theme }));
+        localStorage.setItem('theme', theme);
+        document.documentElement.classList.toggle('dark', theme === 'dark');
+    },
+    toggleTheme: () => {
+        const newTheme = get().theme === 'light' ? 'dark' : 'light';
+        get().setTheme(newTheme);
+    },
+    initializeTheme: () => {
+        const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+        const theme = savedTheme || 'light';
+        set(() => ({ theme }));
+        document.documentElement.classList.toggle('dark', theme === 'dark');
     },
 
     // Books state
