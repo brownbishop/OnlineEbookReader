@@ -2,17 +2,21 @@ import {useAppState} from '@/lib/store';
 import {Rendition} from 'epubjs';
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {ReactReader} from 'react-reader';
-import {useSearchParams} from 'react-router';
+import {useNavigate, useSearchParams} from 'react-router';
+import {Button} from '@/components/ui/button';
 
 function Reader() {
-    const [progress, setProgress] = useState<number>(0);
+    const navigate = useNavigate();
+    const [progress, setProgress] = useState(0);
     const [searchParams] = useSearchParams();
-    const [page, setPage] = useState('');
+
     const [location, setLocation] = useState<string | number>(0);
     const [bookUrl, setBookUrl] = useState<string | ArrayBuffer>('');
     const [isLoading, setIsLoading] = useState(true);
     const rendition = useRef<Rendition | undefined>(undefined);
     const [locationsReady, setLocationsReady] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
     const toc = useRef<any[]>([]);
     const {books, token, syncBookProgress} = useAppState();
 
@@ -38,6 +42,18 @@ function Reader() {
         }
         return 0;
     }, []);
+
+    const handlePrev = () => {
+        if (rendition.current) {
+            rendition.current.prev();
+        }
+    };
+
+    const handleNext = () => {
+        if (rendition.current) {
+            rendition.current.next();
+        }
+    };
 
     // Fetch the book with authentication if bookId is provided
     useEffect(() => {
@@ -84,10 +100,11 @@ function Reader() {
 
     // Restore progress when locations are ready
     useEffect(() => {
-        if (!locationsReady || !bookId || Number(progress) <= 0 || !rendition.current?.book) return;
+        if (!locationsReady || !bookId || progress <= 0 || !rendition.current?.book) return;
         try {
             const book = rendition.current.book;
             const cfi: string | number = book.locations.cfiFromPercentage(progress / 100);
+            // @ts-ignore
             if (cfi !== -1) {
                 rendition.current.display(cfi);
                 setLocation(cfi);
@@ -98,10 +115,6 @@ function Reader() {
     }, [locationsReady, bookId, progress]);
 
     return (<>
-        <div className="absolute top-0 right-0 z-10 text-black">
-            <h3>{page}</h3>
-        </div>
-
         <div className="relative w-screen h-screen" >
             {isLoading ? (
                 <div className="flex items-center justify-center h-full">
@@ -120,11 +133,8 @@ function Reader() {
                         setLocation(loc)
                         if (rendition.current && toc.current) {
                             const {displayed, href} = rendition.current.location.start
-                            const chapter = toc.current.find((item) => item.href === href)
-                            setPage(
-                                `Page ${displayed.page} of ${displayed.total} in chapter ${chapter ? chapter.label : 'n/a'
-                                }`
-                            )
+                            setCurrentPage(displayed.page);
+                            setTotalPages(displayed.total);
 
                             // Calculate and save progress based on book spine
                             let progress = 0;
@@ -160,6 +170,15 @@ function Reader() {
                     <p>Error loading book. Please try again.</p>
                 </div>
             ))}
+        </div>
+
+        <div className="fixed bottom-0 left-0 right-0 flex justify-between items-center p-1 bg-white border-t z-20">
+            <Button size="sm" onClick={() => navigate('/library')}>Back to Library</Button>
+            <div className="flex items-center space-x-1">
+                <Button size="sm" onClick={handlePrev} disabled={currentPage <= 1}>Previous</Button>
+                <span className="text-sm">Page {currentPage} of {totalPages}</span>
+                <Button size="sm" onClick={handleNext} disabled={currentPage >= totalPages}>Next</Button>
+            </div>
         </div>
     </>
     )
