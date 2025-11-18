@@ -5,6 +5,7 @@ import {ReactReader, ReactReaderStyle, type IReactReaderStyle} from 'react-reade
 import {useNavigate, useSearchParams} from 'react-router';
 import {Button} from '@/components/ui/button';
 import {Moon, Sun} from 'lucide-react';
+import { useLocalStorage } from 'usehooks-ts';
 
 function Reader() {
     const navigate = useNavigate();
@@ -169,12 +170,12 @@ function Reader() {
             // @ts-ignore
             if (cfi !== -1) {
                 rendition.current.display(cfi);
-                setLocation(cfi);
+                // setLocation(cfi);
             }
         } catch (error) {
             console.error('Error restoring progress:', error);
         }
-    }, [locationsReady, bookId, progress]);
+    }, [locationsReady]);
 
     useEffect(() => {
         if (rendition.current) {
@@ -199,6 +200,7 @@ function Reader() {
                     pageTurnOnScroll={true}
                     readerStyles={theme === 'dark' ? darkReaderTheme : lightReaderTheme}
                     locationChanged={(loc: string) => {
+                        console.log("location changed: ", loc);
                         setLocation(loc)
                         if (rendition.current && toc.current) {
                             const {displayed, href} = rendition.current.location.start
