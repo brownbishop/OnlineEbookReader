@@ -10,6 +10,7 @@ import UploadBook from './components/UploadBook.tsx'
 import { useAppState } from '@/lib/store'
 import BookLibrary from './components/BookLibrary.tsx'
 import LandingPage from './components/LandingPage.tsx'
+import { ErrorBoundary } from './components/ErrorBoundary'
 
 function RootComponent() {
     const initializeAuth = useAppState(state => state.initializeAuth)
@@ -21,20 +22,27 @@ function RootComponent() {
     }, [initializeAuth, initializeTheme])
 
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<LandingPage />} />
-                <Route path="/home" element={<App />} />
-                <Route path="/reader" element={<Reader />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/upload" element={<UploadBook />} />
-                <Route path="/library" element={<BookLibrary />} />
-            </Routes>
-        </BrowserRouter>
+        <ErrorBoundary>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<LandingPage />} />
+                    <Route path="/home" element={<App />} />
+                    <Route path="/reader" element={<Reader />} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/upload" element={<UploadBook />} />
+                    <Route path="/library" element={<BookLibrary />} />
+                </Routes>
+            </BrowserRouter>
+        </ErrorBoundary>
     )
 }
 
-createRoot(document.getElementById('root')!).render(
+const rootElement = document.getElementById('root')
+if (!rootElement) {
+    throw new Error('Root element not found')
+}
+
+createRoot(rootElement).render(
     <RootComponent />
 )

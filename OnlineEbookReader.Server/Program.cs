@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using OnlineEbookReader.Server.Models;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.StaticFiles;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,9 +40,6 @@ builder.Services.AddControllers();
 
 var app = builder.Build();
 
-app.UseDefaultFiles();
-app.MapStaticAssets();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
@@ -52,15 +50,38 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.UseStaticFiles();
+// Serve static files with proper cache headers
+app.UseStaticFiles(new StaticFileOptions
+{
+    OnPrepareResponse = ctx =>
+    {
+        // Cache static assets (JS, CSS, images) for 1 year
+        if (ctx.File.Name.EndsWith(".js") || 
+            ctx.File.Name.EndsWith(".css") || 
+            ctx.File.Name.EndsWith(".jpg") || 
+            ctx.File.Name.EndsWith(".png") || 
+            ctx.File.Name.EndsWith(".svg"))
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "public, max-age=31536000, immutable");
+        }
+        // Don't cache HTML files
+        else if (ctx.File.Name.EndsWith(".html"))
+        {
+            ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store, must-revalidate");
+            ctx.Context.Response.Headers.Append("Pragma", "no-cache");
+            ctx.Context.Response.Headers.Append("Expires", "0");
+        }
+    }
+});
+
+app.UseDefaultFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
 
+// Fallback to index.html for client-side routing (must be last)
 app.MapFallbackToFile("/index.html");
-
-app.Environment.WebRootPath = "wwwroot";
 
 app.Run();

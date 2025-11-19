@@ -43,6 +43,25 @@ export default defineConfig([
 ])
 ```
 
+## Local AI Summaries
+
+The reader now includes an optional chatbot panel that summarizes the current book using a locally hosted model (for example [Ollama](https://ollama.com/)).
+
+1. Start a local model server, e.g.
+   ```bash
+   ollama run llama3
+   ```
+   or expose any compatible endpoint that accepts `POST /api/generate` with `{ model, prompt }`.
+2. Set the API URL in a Vite env file:
+   ```
+   # .env.local
+   VITE_LOCAL_AI_URL=http://localhost:11434/api/generate
+   ```
+   It defaults to `http://localhost:11434/api/generate` if unset.
+3. Launch the client (`npm run dev`). While reading, click **Summarize** in the footer to open the chatbot and request summaries or explanations of the current chapter.
+
+> If you switch to a hosted model later, point `VITE_LOCAL_AI_URL` to your proxy/server instead of the local Ollama endpoint.
+
 You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
 ```js
