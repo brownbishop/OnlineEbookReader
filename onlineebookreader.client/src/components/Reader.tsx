@@ -5,7 +5,7 @@ import {ReactReader, ReactReaderStyle, type IReactReaderStyle} from 'react-reade
 import {useNavigate, useSearchParams} from 'react-router';
 import {Button} from '@/components/ui/button';
 import {Moon, Sun} from 'lucide-react';
-import { useLocalStorage } from 'usehooks-ts';
+
 
 function Reader() {
     const navigate = useNavigate();
@@ -244,7 +244,8 @@ function Reader() {
             ))}
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 flex justify-between items-center p-1 bg-white border-t z-20 dark:bg-gray-900 dark:border-gray-700">
+
+        <div className={`fixed bottom-0 left-0 right-0 flex justify-between items-center p-1 bg-${theme} border-t z-20 dark:big-gray-900 dark:border-gray-700`}>
             <div className="flex items-center space-x-2">
                 <Button size="sm" onClick={() => navigate('/library')}>Back to Library</Button>
                 <Button size="sm" variant="ghost" onClick={toggleTheme}>
@@ -253,7 +254,7 @@ function Reader() {
             </div>
             <div className="flex items-center space-x-2">
                 <Button size="sm" onClick={handlePrev} disabled={currentPage <= 1}>Previous</Button>
-                <span className="text-sm dark:text-white">Page {currentPage} of {totalPages}</span>
+                <span className="text-sm text-dark">Page {currentPage} of {totalPages}</span>
                 <Button size="sm" onClick={handleNext} disabled={currentPage >= totalPages}>Next</Button>
             </div>
         </div>
