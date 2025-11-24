@@ -11,6 +11,7 @@ import { useAppState } from '@/lib/store'
 import BookLibrary from './components/BookLibrary.tsx'
 import LandingPage from './components/LandingPage.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import FoliateReader from './components/FoliateReader.tsx'
 
 function RootComponent() {
     const initializeAuth = useAppState(state => state.initializeAuth)
@@ -27,11 +28,11 @@ function RootComponent() {
                 <Routes>
                     <Route path="/" element={<LandingPage />} />
                     <Route path="/home" element={<App />} />
-                    <Route path="/reader" element={<Reader />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
                     <Route path="/upload" element={<UploadBook />} />
                     <Route path="/library" element={<BookLibrary />} />
+                    <Route path="/reader" element={<FoliateReader />} />
                 </Routes>
             </BrowserRouter>
         </ErrorBoundary>
