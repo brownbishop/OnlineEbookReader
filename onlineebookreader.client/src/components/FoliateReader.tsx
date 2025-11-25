@@ -1,19 +1,21 @@
-import {useAppState} from '@/lib/store';
-import React, {useState, useEffect, useRef} from 'react';
-import {Reader, ReaderContent, ReaderNext, ReaderPrevious, loadEPUB, type Book, useSearch, useBookNavigator} from 'react-ebookjs'
+import { useAppState } from '@/lib/store';
+import React, { useState, useEffect, useRef } from 'react';
+import { Reader, ReaderContent, ReaderNext, ReaderPrevious, loadEPUB, type Book, useSearch, useBookNavigator } from 'react-ebookjs'
 
-import {useNavigate, useSearchParams} from 'react-router-dom';
-import {Button} from '@/components/ui/button';
-import {Moon, Sun} from 'lucide-react';
-import {delay} from 'lodash';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun } from 'lucide-react';
+import { delay } from 'lodash';
+import ChatComponent from './ChatComponent';
 
 function FoliateReader() {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
     const [isLoading, setIsLoading] = useState(true);
-    const {books, token, syncBookProgress, theme, toggleTheme} = useAppState();
+    const { books, token, syncBookProgress, theme, toggleTheme } = useAppState();
     const [book, setBook] = useState<Book | null>(null);
+    const [epubData, setEpubData] = useState<Blob | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Reader settings
@@ -51,6 +53,7 @@ function FoliateReader() {
         if (!file) return;
 
         try {
+            setEpubData(file);
             const loadedBook = await loadEPUB(file);
             setBook(loadedBook);
         } catch (error) {
@@ -84,6 +87,7 @@ function FoliateReader() {
                     }
 
                     const blob = await response.blob();
+                    setEpubData(blob);
                     const epubFile = await loadEPUB(blob);
                     setBook(epubFile);
                 } catch (error) {
@@ -119,6 +123,7 @@ function FoliateReader() {
         if (!file) return;
 
         try {
+            setEpubData(file);
             const loadedBook = await loadEPUB(file);
             setBook(loadedBook);
         } catch (error) {
@@ -356,14 +361,16 @@ function FoliateReader() {
                     </div>
                 </>
             )}
+
+            <ChatComponent epubData={epubData} />
         </div>
     );
 }
 
 // Search Results component to display search results
-function SearchResults({query, theme}: {query: string; theme: 'light' | 'dark'}) {
-    const {loading, results} = useSearch(query);
-    const {goTo} = useBookNavigator()
+function SearchResults({ query, theme }: { query: string; theme: 'light' | 'dark' }) {
+    const { loading, results } = useSearch(query);
+    const { goTo } = useBookNavigator()
 
     const bgBox = theme === 'dark' ? 'bg-zinc-900' : 'bg-white';
     const borderClass = theme === 'dark' ? 'border-zinc-700' : 'border-gray-300';
@@ -414,8 +421,8 @@ interface TableOfContentsProps {
     }>;
 }
 
-function TableOfContents({toc}: TableOfContentsProps) {
-    const {goTo} = useBookNavigator();
+function TableOfContents({ toc }: TableOfContentsProps) {
+    const { goTo } = useBookNavigator();
 
     const handleTOCItemClick = async (href: string) => {
         await goTo(href);

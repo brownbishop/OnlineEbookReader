@@ -1,7 +1,7 @@
-import {createRoot} from 'react-dom/client'
-import {useEffect} from 'react'
+import { createRoot } from 'react-dom/client'
+import { useEffect } from 'react'
 import App from './App.tsx'
-import {BrowserRouter, Routes, Route} from 'react-router-dom'
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Reader from '@/components/Reader'
 import Login from '@/components/Login'
 import './styles/globals.css'
@@ -12,6 +12,7 @@ import BookLibrary from './components/BookLibrary.tsx'
 import LandingPage from './components/LandingPage.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import FoliateReader from './components/FoliateReader.tsx'
+
 
 function RootComponent() {
     const initializeAuth = useAppState(state => state.initializeAuth)
@@ -34,6 +35,7 @@ function RootComponent() {
                     <Route path="/library" element={<BookLibrary />} />
                     <Route path="/reader" element={<FoliateReader />} />
                 </Routes>
+
             </BrowserRouter>
         </ErrorBoundary>
     )
