@@ -9,13 +9,15 @@ import { delay } from 'lodash';
 import ChatComponent from './ChatComponent';
 
 function FoliateReader() {
-    const navigate = useNavigate();
+
     const [searchParams] = useSearchParams();
 
     const [isLoading, setIsLoading] = useState(true);
     const { books, token, syncBookProgress, theme, toggleTheme } = useAppState();
     const [book, setBook] = useState<Book | null>(null);
-    const [epubData, setEpubData] = useState<Blob | null>(null);
+
+    const [bookBlob, setBookBlob] = useState<Blob | null>(null);
+    const [bookUrl, setBookUrl] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Reader settings
@@ -33,7 +35,6 @@ function FoliateReader() {
 
     const url: string = searchParams.get('url') || "";
     const bookId: string = searchParams.get('bookId') || "";
-    const title: string = searchParams.get('title') || "";
 
     // Theme-based colors
     const bgPrimary = () => theme === 'dark' ? 'bg-zinc-900' : 'bg-white';
@@ -53,9 +54,10 @@ function FoliateReader() {
         if (!file) return;
 
         try {
-            setEpubData(file);
+            setBookBlob(file);
             const loadedBook = await loadEPUB(file);
             setBook(loadedBook);
+            setBookUrl(file.webkitRelativePath);
         } catch (error) {
             console.error('Error loading EPUB:', error);
             alert('Failed to load EPUB file. Please try another file.');
@@ -74,7 +76,8 @@ function FoliateReader() {
                     setProgress(Number(book.progress) / 100);
                     setInitialProgress(Number(book.progress) / 100);
 
-
+                    const fileUrl = "/home/catalin/repos/OnlineEbookReader/OnlineEbookReader.Server/wwwroot" + book.fileUrl;
+                    setBookUrl(fileUrl);
                     const response = await fetch(`https://localhost:55942/api/books/download/${bookId}`, {
                         method: 'GET',
                         headers: {
@@ -87,9 +90,9 @@ function FoliateReader() {
                     }
 
                     const blob = await response.blob();
-                    setEpubData(blob);
                     const epubFile = await loadEPUB(blob);
                     setBook(epubFile);
+                    setBookBlob(blob);
                 } catch (error) {
                     console.error('Error fetching book:', error);
                     setBook(null);
@@ -123,7 +126,7 @@ function FoliateReader() {
         if (!file) return;
 
         try {
-            setEpubData(file);
+            setBookUrl(file.webkitRelativePath);
             const loadedBook = await loadEPUB(file);
             setBook(loadedBook);
         } catch (error) {
@@ -362,7 +365,7 @@ function FoliateReader() {
                 </>
             )}
 
-            <ChatComponent epubData={epubData} />
+            <ChatComponent bookUrl={bookUrl} />
         </div>
     );
 }

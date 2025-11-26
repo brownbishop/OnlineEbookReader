@@ -1,11 +1,11 @@
-import {useEffect, useState, useMemo, useRef} from 'react';
-import {useAppState} from '@/lib/store';
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
-import {Button} from '@/components/ui/button';
-import {Input} from '@/components/ui/input';
-import {useNavigate, useLocation} from 'react-router-dom';
-import {Navbar01, type Navbar01Props, Logo} from '@/components/Navbar';
-import {Trash2} from 'lucide-react';
+import { useEffect, useState, useMemo, useRef } from 'react';
+import { useAppState } from '@/lib/store';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Navbar01, type Navbar01Props, Logo } from '@/components/Navbar';
+import { Trash2 } from 'lucide-react';
 
 export default function BookLibrary() {
     const navigate = useNavigate();
@@ -197,7 +197,6 @@ export default function BookLibrary() {
         );
     }
 
-    console.log(books);
     return (
         <>
             <Navbar01 {...navbarProps} />
@@ -337,13 +336,13 @@ export default function BookLibrary() {
                                                     <span className="text-xs text-muted-foreground">Progress</span>
                                                     <span className="text-xs font-semibold">{book.progress}%</span>
                                                 </div>
-                                                    <div className="w-full bg-amber-200 dark:bg-amber-900 rounded-full h-2">
-                                                        <div
-                                                            className="bg-amber-700 rounded-full h-2 transition-all"
-                                                            style={{
-                                                                width: `${Math.min(book.progress || 0, 100)}%`,
-                                                            }}
-                                                        />
+                                                <div className="w-full bg-amber-200 dark:bg-amber-900 rounded-full h-2">
+                                                    <div
+                                                        className="bg-amber-700 rounded-full h-2 transition-all"
+                                                        style={{
+                                                            width: `${Math.min(book.progress || 0, 100)}%`,
+                                                        }}
+                                                    />
                                                 </div>
                                             </div>
                                         )}

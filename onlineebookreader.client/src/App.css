@@ -4,13 +4,11 @@
 
 @plugin "tailwindcss-animate";
 
-
 @custom-variant dark (&:is(.dark *));
 
 #root {
     width: 100%;
 }
-
 
 th, td {
     padding-left: 1rem;
@@ -133,3 +131,5 @@ th, td {
     min-height: 100vh;
     }
 }
+
+@source '../node_modules/@llamaindex/chat-ui/**/*.{ts,tsx}';
