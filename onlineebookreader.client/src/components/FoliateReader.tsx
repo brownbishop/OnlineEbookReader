@@ -76,7 +76,7 @@ function FoliateReader() {
                     setProgress(Number(book.progress) / 100);
                     setInitialProgress(Number(book.progress) / 100);
 
-                    const fileUrl = "/home/catalin/repos/OnlineEbookReader/OnlineEbookReader.Server/wwwroot" + book.fileUrl;
+                    const fileUrl = "/home/catalin/repos/OnlineEbookReader/OnlineEbookReader.Server/" + book.fileUrl;
                     setBookUrl(fileUrl);
                     const response = await fetch(`https://localhost:55942/api/books/download/${bookId}`, {
                         method: 'GET',

@@ -3,6 +3,7 @@ import type {Part} from "@opencode-ai/sdk";
 import {Loader, MessageSquare, Send, X} from 'lucide-react';
 import {useCallback, useEffect, useRef, useState} from "react";
 import {RefreshCw} from 'lucide-react';
+import {useAppState} from "@/lib/store";
 
 // ====================================================================
 // --- CONFIGURATION ---
@@ -36,6 +37,7 @@ interface Message {
 }
 
 const OpencodeChatWidget = ({bookUrl}: ChatComponentProps) => {
+    const {theme} = useAppState();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
         {text: "Hello! I'm connected to your local Opencode instance.", sender: MESSAGE_TYPE.AI}
@@ -86,23 +88,42 @@ const OpencodeChatWidget = ({bookUrl}: ChatComponentProps) => {
             setConnectionStatus('connected');
             console.log("Opencode Session Created:", id);
 
+        } catch (error) {
+            console.error("Opencode Connection Error:", error);
+            setConnectionStatus('error');
+            setMessages(prev => [...prev, {
+                text: "Could not connect to Opencode server. Is it running? (run 'opencode' in terminal)",
+                sender: MESSAGE_TYPE.ERROR
+            }]);
+        }
+    }, []);
+
+    // Initialize on mount
+    useEffect(() => {
+        initOpencode();
+    }, [initOpencode]);
 
 
-            const userMessageText = "This is the file path to the book you have to use to answer messages: " + bookUrl;
+    useEffect(() => {
+        const effect = async () => {
+            if (!client || !sessionId) return;
+
+            const userMessageText = "This is the file path to the book you have to use to answer messages. File path: " + bookUrl;
 
             try {
                 // API Call to Opencode SDK
                 // client.session.prompt sends the message and awaits the response
-                const response = await newClient.session.prompt({
-                    path: {id: id},
+                const response = await client.session.prompt({
+                    path: {id: sessionId},
                     body: {
                         model: CONFIG.model,
-                        parts: [{type: "text", text: userMessageText}],
+                        parts: [{type: "text", text: userMessageText + bookUrl}],
                     },
                 });
 
                 // The SDK returns a response with info and parts
                 const responseData = (response as unknown as {data?: {parts?: Part[]}}).data || response as unknown as {parts?: Part[]};
+                console.log(responseData);
                 const aiText = (responseData?.parts as Part[])
                     .map((p: Part) => {
                         if ('text' in p) {
@@ -128,21 +149,9 @@ const OpencodeChatWidget = ({bookUrl}: ChatComponentProps) => {
             } finally {
                 setIsLoading(false);
             }
-        } catch (error) {
-            console.error("Opencode Connection Error:", error);
-            setConnectionStatus('error');
-            setMessages(prev => [...prev, {
-                text: "Could not connect to Opencode server. Is it running? (run 'opencode' in terminal)",
-                sender: MESSAGE_TYPE.ERROR
-            }]);
         }
-    }, []);
-
-    // Initialize on mount
-    useEffect(() => {
-        initOpencode();
-    }, [initOpencode]);
-
+        effect().catch(err => console.error(err));
+    }, [bookUrl, client, sessionId]);
 
     // --- 2. SEND MESSAGE FUNCTION ---
     const handleSendMessage = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
@@ -236,16 +245,16 @@ const OpencodeChatWidget = ({bookUrl}: ChatComponentProps) => {
     };
 
     return (
-        <div className="fixed bottom-6 right-6 z-50 font-sans">
+        <div className="fixed bottom-20 right-6 z-50 font-sans">
 
             {/* CHAT WINDOW */}
             {isOpen && (
                 <div className="absolute bottom-20 right-0 w-96 h-[500px] bg-gray-50 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-gray-200 ring-1 ring-black/5">
 
                     {/* Header */}
-                    <div className="bg-white p-4 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
+                    <div className="bg-amber-600 p-4 border-b border-gray-100 flex justify-between items-center sticky top-0 z-10">
                         <div>
-                            <h3 className="font-bold text-gray-800">Opencode Assistant</h3>
+                            <h3 className="font-bold text-white">Opencode Assistant</h3>
                             <div className="flex items-center gap-1.5 mt-1">
                                 <span className={`w-2 h-2 rounded-full ${connectionStatus === 'connected' ? 'bg-green-500' : connectionStatus === 'connecting' ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
                                 <span className="text-xs text-gray-500 capitalize">{connectionStatus}</span>
