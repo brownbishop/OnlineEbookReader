@@ -58,7 +58,7 @@ export default function BookLibrary() {
                 booksWithCovers.map(async (book) => {
                     try {
                         const response = await fetch(
-                            `https://localhost:55942/api/books/downloadcover/${book.id}`,
+                            `/api/books/downloadcover/${book.id}`,
                             {
                                 method: 'GET',
                                 headers: {

@@ -1,21 +1,21 @@
-import {useAppState} from '@/lib/store';
-import React, {useState, useEffect, useRef} from 'react';
-import {Reader, ReaderContent, ReaderNext, ReaderPrevious, loadEPUB, type Book, useSearch, useBookNavigator} from 'react-ebookjs'
+import { useAppState } from '@/lib/store';
+import React, { useState, useEffect, useRef } from 'react';
+import { Reader, ReaderContent, ReaderNext, ReaderPrevious, loadEPUB, type Book, useSearch, useBookNavigator } from 'react-ebookjs'
 
-import {useNavigate, useSearchParams} from 'react-router-dom';
-import {Button} from '@/components/ui/button';
-import {Moon, Sun} from 'lucide-react';
-import {delay} from 'lodash';
+import { useSearchParams } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Moon, Sun } from 'lucide-react';
+import { delay } from 'lodash';
 
 function FoliateReader() {
-    const navigate = useNavigate();
+    // const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
-     const [isLoading, setIsLoading] = useState(true);
-     const { books, token, syncBookProgress, theme, toggleTheme } = useAppState();
-     const [book, setBook] = useState<Book | null>(null);
-     const [bookBlob, setBookBlob] = useState<Blob | null>(null);
-     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const { books, token, syncBookProgress, theme, toggleTheme } = useAppState();
+    const [book, setBook] = useState<Book | null>(null);
+    const [_bookBlob, setBookBlob] = useState<Blob | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Reader settings
     const [fontSize, setFontSize] = useState(16);
@@ -32,7 +32,7 @@ function FoliateReader() {
 
     const url: string = searchParams.get('url') || "";
     const bookId: string = searchParams.get('bookId') || "";
-    const title: string = searchParams.get('title') || "";
+    // const title: string = searchParams.get('title') || "";
 
     // Theme-based colors
     const bgPrimary = () => theme === 'dark' ? 'bg-zinc-900' : 'bg-white';
@@ -73,7 +73,7 @@ function FoliateReader() {
                     setInitialProgress(Number(book.progress) / 100);
 
 
-                    const response = await fetch(`https://localhost:55942/api/books/download/${bookId}`, {
+                    const response = await fetch(`/api/books/download/${bookId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -363,9 +363,9 @@ function FoliateReader() {
 }
 
 // Search Results component to display search results
-function SearchResults({query, theme}: {query: string; theme: 'light' | 'dark'}) {
-    const {loading, results} = useSearch(query);
-    const {goTo} = useBookNavigator()
+function SearchResults({ query, theme }: { query: string; theme: 'light' | 'dark' }) {
+    const { loading, results } = useSearch(query);
+    const { goTo } = useBookNavigator()
 
     const bgBox = theme === 'dark' ? 'bg-zinc-900' : 'bg-white';
     const borderClass = theme === 'dark' ? 'border-zinc-700' : 'border-gray-300';
@@ -416,8 +416,8 @@ interface TableOfContentsProps {
     }>;
 }
 
-function TableOfContents({toc}: TableOfContentsProps) {
-    const {goTo} = useBookNavigator();
+function TableOfContents({ toc }: TableOfContentsProps) {
+    const { goTo } = useBookNavigator();
 
     const handleTOCItemClick = async (href: string) => {
         await goTo(href);

@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client'
 import { useEffect } from 'react'
 import App from './App.tsx'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
-import Reader from '@/components/Reader'
+
 import Login from '@/components/Login'
 import './styles/globals.css'
 import Signup from '@/components/Signup.tsx'

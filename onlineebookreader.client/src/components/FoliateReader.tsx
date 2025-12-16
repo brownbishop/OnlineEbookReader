@@ -2,11 +2,10 @@ import { useAppState } from '@/lib/store';
 import React, { useState, useEffect, useRef } from 'react';
 import { Reader, ReaderContent, ReaderNext, ReaderPrevious, loadEPUB, type Book, useSearch, useBookNavigator } from 'react-ebookjs'
 
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Moon, Sun } from 'lucide-react';
 import { delay } from 'lodash';
-import ChatComponent from './ChatComponent';
 
 function FoliateReader() {
 
@@ -16,8 +15,8 @@ function FoliateReader() {
     const { books, token, syncBookProgress, theme, toggleTheme } = useAppState();
     const [book, setBook] = useState<Book | null>(null);
 
-    const [bookBlob, setBookBlob] = useState<Blob | null>(null);
-    const [bookUrl, setBookUrl] = useState('');
+    const [_bookBlob, setBookBlob] = useState<Blob | null>(null);
+    const [_bookUrl, setBookUrl] = useState('');
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     // Reader settings
@@ -76,9 +75,9 @@ function FoliateReader() {
                     setProgress(Number(book.progress) / 100);
                     setInitialProgress(Number(book.progress) / 100);
 
-                    const fileUrl = "/home/catalin/repos/OnlineEbookReader/OnlineEbookReader.Server/" + book.fileUrl;
-                    setBookUrl(fileUrl);
-                    const response = await fetch(`https://localhost:55942/api/books/download/${bookId}`, {
+                    // const fileUrl = "/home/catalin/repos/OnlineEbookReader/OnlineEbookReader.Server/" + book.fileUrl;
+                    // setBookUrl(fileUrl);
+                    const response = await fetch(`/api/books/download/${bookId}`, {
                         method: 'GET',
                         headers: {
                             'Authorization': `Bearer ${token}`,
@@ -364,8 +363,6 @@ function FoliateReader() {
                     </div>
                 </>
             )}
-
-            <ChatComponent bookUrl={bookUrl} />
         </div>
     );
 }

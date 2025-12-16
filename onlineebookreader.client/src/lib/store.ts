@@ -1,4 +1,4 @@
-import {create} from 'zustand';
+import { create } from 'zustand';
 
 export interface Book {
     id: number;
@@ -125,7 +125,7 @@ export const useAppState = create<AppState>()((set, get) => ({
 
         set(() => ({ isLoading: true, error: null }));
         try {
-            const response = await fetch('https://localhost:55942/api/books', {
+            const response = await fetch('/api/books', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${state.token}`,
@@ -154,7 +154,7 @@ export const useAppState = create<AppState>()((set, get) => ({
 
         set(() => ({ isLoading: true, error: null }));
         try {
-            const response = await fetch(`https://localhost:55942/api/books/${id}`, {
+            const response = await fetch(`/api/books/${id}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${state.token}`,
@@ -194,7 +194,7 @@ export const useAppState = create<AppState>()((set, get) => ({
         }));
 
         try {
-            const response = await fetch(`https://localhost:55942/api/books/${id}/progress`, {
+            const response = await fetch(`/api/books/${id}/progress`, {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${state.token}`,
@@ -224,7 +224,7 @@ export const useAppState = create<AppState>()((set, get) => ({
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await fetch('https://localhost:55942/api/books/Upload', {
+            const response = await fetch('/api/books/Upload', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${state.token}`,
@@ -259,7 +259,7 @@ export const useAppState = create<AppState>()((set, get) => ({
 
         set(() => ({ isLoading: true, error: null }));
         try {
-            const response = await fetch(`https://localhost:55942/api/books/${id}`, {
+            const response = await fetch(`/api/books/${id}`, {
                 method: 'DELETE',
                 headers: {
                     'Authorization': `Bearer ${state.token}`,
