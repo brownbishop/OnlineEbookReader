@@ -50,6 +50,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseDefaultFiles();
+
 // Serve static files with proper cache headers
 app.UseStaticFiles(new StaticFileOptions
 {
@@ -73,8 +75,6 @@ app.UseStaticFiles(new StaticFileOptions
         }
     }
 });
-
-app.UseDefaultFiles();
 
 app.UseAuthentication();
 app.UseAuthorization();
